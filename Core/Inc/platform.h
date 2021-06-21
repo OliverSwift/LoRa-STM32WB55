@@ -33,10 +33,9 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>
-//#include "stm32l4xx.h"
 #include "main.h"
-//#include "stm32l4xx_nucleo.h"
-//#include "nucleo_l476rg_bus.h"
+#include "nucleo_wbxx_bus.h"
+#include "nucleo_wbxx_errno.h"
 
 /* USER CODE BEGIN include */
 

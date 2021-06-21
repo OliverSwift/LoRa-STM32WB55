@@ -121,8 +121,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Drivers/BSP/sx1272mb2das}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/conf}&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/misc}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/timer}&quot;"/>
