@@ -74,6 +74,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/misc}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/timer}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/sequencer}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -124,6 +126,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/misc}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/timer}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/sequencer}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -180,6 +184,8 @@
                     <fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1388096308.182007741" name="LICENSE.txt" rcbsApplicability="disable" resourcePath="Middlewares/SubGHz_Phy/LICENSE.txt" toolsToInvoke=""/>
                     					
                     <sourceEntries>
+                        						
+                        <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="App"/>
                         						
                         <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
                         						
@@ -270,6 +276,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/misc}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/timer}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/sequencer}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -318,6 +326,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/misc}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/timer}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Utilities/sequencer}&quot;"/>
                                     								
                                 </option>
                                 								
