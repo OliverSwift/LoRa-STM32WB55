@@ -34,12 +34,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
 #include "stm32_timer.h"
-//#include "sys_app.h"
+#include "sys_app.h"
 #include "subghz_phy_app.h"
 #include "radio.h"
 #include "radio_board_if.h"
 #include "stm32_seq.h"
-//#include "utilities_def.h"
+#include "utilities_def.h"
 #include "app_version.h"
 
 /* USER CODE BEGIN Includes */

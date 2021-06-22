@@ -20,7 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "app_subghz_phy.h"
 #include "subghz_phy_app.h"
-//#include "sys_app.h"
+#include "sys_app.h"
 #include "stm32_seq.h"
 
 /* USER CODE BEGIN Includes */
