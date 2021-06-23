@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "app_subghz_phy.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -87,8 +88,9 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_SPI1_Init();
+  //MX_GPIO_Init();
+  //MX_SPI1_Init();
+  MX_SubGHz_Phy_Init();
   /* USER CODE BEGIN 2 */
 
   BSP_LED_Init(LED_GREEN);
@@ -99,6 +101,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+#if 0
   short count = 0;
   while (1)
   {
@@ -110,6 +113,10 @@ int main(void)
 	  }
 
     /* USER CODE BEGIN 3 */
+  }
+#endif
+  while(1) {
+	  MX_SubGHz_Phy_Process();
   }
   /* USER CODE END 3 */
 }
