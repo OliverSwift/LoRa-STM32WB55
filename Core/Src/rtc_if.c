@@ -26,7 +26,7 @@
 #include "rtc_if.h"
 #include "stm32_lpm.h"
 #include "utilities_def.h"
-#include "stm32wbxx_ll_rtc.h"
+//#include "stm32wbxx_ll_rtc.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -519,13 +519,15 @@ static void RTC_StartWakeUpAlarm(uint32_t timeoutValue)
 static uint32_t RTC_GetCalendarValue(RTC_DateTypeDef *RTC_DateStruct, RTC_TimeTypeDef *RTC_TimeStruct)
 {
   uint32_t calendarValue = 0;
-  uint32_t first_read;
   uint32_t correction;
 
   /* Get Time and Date*/
   HAL_RTC_GetTime(&hrtc, RTC_TimeStruct, RTC_FORMAT_BIN);
+  HAL_RTC_GetDate(&hrtc, RTC_DateStruct, RTC_FORMAT_BIN);
 
   /* make sure it is correct due to asynchronus nature of RTC*/
+#if 0
+  uint32_t first_read;
   do
   {
     first_read = LL_RTC_TIME_GetSubSecond(RTC);
@@ -533,6 +535,7 @@ static uint32_t RTC_GetCalendarValue(RTC_DateTypeDef *RTC_DateStruct, RTC_TimeTy
     HAL_RTC_GetTime(&hrtc, RTC_TimeStruct, RTC_FORMAT_BIN);
 
   } while (first_read != LL_RTC_TIME_GetSubSecond(RTC));
+#endif
 
   /* calculte amount of elapsed days since 01/01/2000 */
   calendarValue = DIVC((DAYS_IN_YEAR * 3 + DAYS_IN_LEAP_YEAR) * RTC_DateStruct->Year, 4);

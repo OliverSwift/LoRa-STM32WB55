@@ -187,6 +187,7 @@ void MX_RTC_Init(void)
 {
 
   /* USER CODE BEGIN RTC_Init 0 */
+  HAL_PWR_EnableBkUpAccess(); // Needed to access RTC registers
 
   /* USER CODE END RTC_Init 0 */
 
