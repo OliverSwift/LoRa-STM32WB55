@@ -216,7 +216,7 @@ void SubghzApp_Init(void)
   Radio.SetChannel(RF_FREQUENCY);
 
   LED_Init(LED_GREEN);
-  LED_Init(LED_RED1);
+  LED_Init(LED_RED);
 
   Radio.Rx(RX_TIMEOUT_VALUE);
 
@@ -253,7 +253,7 @@ static void PingPong_Process(void)
 
             LED_Off(LED_GREEN);
             /* Indicates on a LED that the received frame is a PONG */
-            LED_Toggle(LED_RED1);
+            LED_Toggle(LED_RED);
 
             /* Send the next PING frame */
             Buffer[0] = 'P';
@@ -306,7 +306,7 @@ static void PingPong_Process(void)
             /* Indicates on a LED that the received frame is a PING */
             UTIL_TIMER_Stop(&timerLed);
 
-            LED_Off(LED_RED1);
+            LED_Off(LED_RED);
             LED_Toggle(LED_GREEN);
 
             /* Send the reply to the PONG string */
@@ -484,7 +484,7 @@ static void OnledEvent(void *context)
 
   /* USER CODE END OnledEvent_1 */
   LED_Toggle(LED_GREEN);
-  LED_Toggle(LED_RED1);
+  LED_Toggle(LED_RED);
 
   UTIL_TIMER_Start(&timerLed);
   /* USER CODE BEGIN OnledEvent_2 */
