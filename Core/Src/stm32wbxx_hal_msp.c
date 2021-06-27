@@ -80,46 +80,58 @@ void HAL_MspInit(void)
 * @param hrtc: RTC handle pointer
 * @retval None
 */
-void HAL_RTC_MspInit(RTC_HandleTypeDef* hrtc)
+void HAL_RTC_MspInit(RTC_HandleTypeDef *rtcHandle)
 {
-  if(hrtc->Instance==RTC)
+
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  if (rtcHandle->Instance == RTC)
   {
-  /* USER CODE BEGIN RTC_MspInit 0 */
+    /* USER CODE BEGIN RTC_MspInit 0 */
+    HAL_PWR_EnableBkUpAccess(); // Needed to access RTC registers
 
-  /* USER CODE END RTC_MspInit 0 */
-    /* Peripheral clock enable */
+    /* USER CODE END RTC_MspInit 0 */
+    /** Initializes the peripherals clocks
+    */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
+    RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+    RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
+    RCC_OscInitStruct.HSEState = RCC_HSE_OFF;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* RTC clock enable */
     __HAL_RCC_RTC_ENABLE();
-    __HAL_RCC_RTCAPB_CLK_ENABLE();
-  /* USER CODE BEGIN RTC_MspInit 1 */
 
-  /* USER CODE END RTC_MspInit 1 */
+    /* RTC interrupt Init */
+    HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+    /* USER CODE BEGIN RTC_MspInit 1 */
+
+    /* USER CODE END RTC_MspInit 1 */
   }
-
 }
 
-/**
-* @brief RTC MSP De-Initialization
-* This function freeze the hardware resources used in this example
-* @param hrtc: RTC handle pointer
-* @retval None
-*/
-void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc)
+void HAL_RTC_MspDeInit(RTC_HandleTypeDef *rtcHandle)
 {
-  if(hrtc->Instance==RTC)
-  {
-  /* USER CODE BEGIN RTC_MspDeInit 0 */
 
-  /* USER CODE END RTC_MspDeInit 0 */
+  if (rtcHandle->Instance == RTC)
+  {
+    /* USER CODE BEGIN RTC_MspDeInit 0 */
+
+    /* USER CODE END RTC_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_RTC_DISABLE();
-    __HAL_RCC_RTCAPB_CLK_DISABLE();
-  /* USER CODE BEGIN RTC_MspDeInit 1 */
 
-  /* USER CODE END RTC_MspDeInit 1 */
+    /* RTC interrupt Deinit */
+    HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
+    /* USER CODE BEGIN RTC_MspDeInit 1 */
+
+    /* USER CODE END RTC_MspDeInit 1 */
   }
-
 }
-
 /**
 * @brief SPI MSP Initialization
 * This function configures the hardware resources used in this example

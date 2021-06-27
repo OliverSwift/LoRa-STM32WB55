@@ -94,58 +94,6 @@ void MX_RTC_Init(void)
 
 }
 
-void HAL_RTC_MspInit(RTC_HandleTypeDef *rtcHandle)
-{
-
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  if (rtcHandle->Instance == RTC)
-  {
-    /* USER CODE BEGIN RTC_MspInit 0 */
-    HAL_PWR_EnableBkUpAccess(); // Needed to access RTC registers
-
-    /* USER CODE END RTC_MspInit 0 */
-    /** Initializes the peripherals clocks
-    */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE;
-    RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-    RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
-    RCC_OscInitStruct.HSEState = RCC_HSE_OFF;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    /* RTC clock enable */
-    __HAL_RCC_RTC_ENABLE();
-
-    /* RTC interrupt Init */
-    HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
-    /* USER CODE BEGIN RTC_MspInit 1 */
-
-    /* USER CODE END RTC_MspInit 1 */
-  }
-}
-
-void HAL_RTC_MspDeInit(RTC_HandleTypeDef *rtcHandle)
-{
-
-  if (rtcHandle->Instance == RTC)
-  {
-    /* USER CODE BEGIN RTC_MspDeInit 0 */
-
-    /* USER CODE END RTC_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_RTC_DISABLE();
-
-    /* RTC interrupt Deinit */
-    HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
-    /* USER CODE BEGIN RTC_MspDeInit 1 */
-
-    /* USER CODE END RTC_MspDeInit 1 */
-  }
-}
 
 /* USER CODE BEGIN 1 */
 

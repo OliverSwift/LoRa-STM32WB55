@@ -93,7 +93,7 @@ int main(void)
   /* Initialize all configured peripherals */
   //MX_GPIO_Init();
   //MX_SPI1_Init();
-  MX_RTC_Init();
+  //MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   MX_SubGHz_Phy_Init();
 
@@ -187,7 +187,6 @@ static void MX_RTC_Init(void)
 {
 
   /* USER CODE BEGIN RTC_Init 0 */
-  HAL_PWR_EnableBkUpAccess(); // Needed to access RTC registers
 
   /* USER CODE END RTC_Init 0 */
 

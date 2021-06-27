@@ -21,9 +21,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32wbxx_it.h"
-#include "radio_board_if.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "radio_board_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,9 +58,8 @@
 
 /* External variables --------------------------------------------------------*/
 
-extern RTC_HandleTypeDef hrtc;
 /* USER CODE BEGIN EV */
-
+extern RTC_HandleTypeDef hrtc;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -224,7 +223,7 @@ void EXTI15_10_IRQHandler(void)
 #if (defined(SX1276MB1MAS) | defined(SX1276MB1LAS) | defined(SX1272MB2DAS))
   // TODO
   // Check which DIO pin triggered the interrupt
-  // then call the handler with correspondig pin info
+  // then call the handler with corresponding pin info
   //HAL_EXTI_IRQHandler(&H_EXTI_DIO1);
   //HAL_EXTI_IRQHandler(&H_EXTI_DIO2);
   //HAL_EXTI_IRQHandler(&H_EXTI_DIO3);

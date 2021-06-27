@@ -199,15 +199,15 @@
                     					
                     <sourceEntries>
                         						
+                        <entry excluding="STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_rtc.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+                        						
+                        <entry excluding="lpm/tiny_lpm/stm32_lpm_if_template.c|trace/adv_trace/stm32_adv_trace_if_template.c|misc/stm32_systime_if_template.c|timer/stm32_timer_if_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
+                        						
                         <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="App"/>
                         						
                         <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
                         						
-                        <entry excluding="STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_rtc.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
-                        						
                         <entry excluding="SubGHz_Phy/Release_Notes.html|SubGHz_Phy/LICENSE.txt" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
-                        						
-                        <entry excluding="lpm/tiny_lpm/stm32_lpm_if_template.c|trace/adv_trace/stm32_adv_trace_if_template.c|misc/stm32_systime_if_template.c|timer/stm32_timer_if_template.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Utilities"/>
                         					
                     </sourceEntries>
                     				
