@@ -26,6 +26,7 @@
 #include "stm32_systime.h"
 #include "stm32_lpm.h"
 #include "stm32_timer.h"
+#include "rtc_if.h"
 #include "utilities_def.h"
 
 /* USER CODE BEGIN Includes */
