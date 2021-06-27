@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32wbxx_it.h"
+#include "radio_board_if.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -57,6 +58,7 @@
 
 /* External variables --------------------------------------------------------*/
 
+extern RTC_HandleTypeDef hrtc;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -208,6 +210,36 @@ void SysTick_Handler(void)
 void EXTI4_IRQHandler(void)
 {
   HAL_GPIO_EXTI_IRQHandler(BUTTON_SW1_PIN);
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+#if (defined(SX1276MB1MAS) | defined(SX1276MB1LAS) | defined(SX1272MB2DAS))
+  HAL_EXTI_IRQHandler(&H_EXTI_DIO0);
+#endif
+}
+
+void EXTI15_10_IRQHandler(void)
+{
+#if (defined(SX1276MB1MAS) | defined(SX1276MB1LAS) | defined(SX1272MB2DAS))
+  // TODO
+  // Check which DIO pin triggered the interrupt
+  // then call the handler with correspondig pin info
+  //HAL_EXTI_IRQHandler(&H_EXTI_DIO1);
+  //HAL_EXTI_IRQHandler(&H_EXTI_DIO2);
+  //HAL_EXTI_IRQHandler(&H_EXTI_DIO3);
+#endif
+}
+
+void RTC_Alarm_IRQHandler(void)
+{
+  /* USER CODE BEGIN RTC_Alarm_IRQn 0 */
+
+  /* USER CODE END RTC_Alarm_IRQn 0 */
+  HAL_RTC_AlarmIRQHandler(&hrtc);
+  /* USER CODE BEGIN RTC_Alarm_IRQn 1 */
+
+  /* USER CODE END RTC_Alarm_IRQn 1 */
 }
 
 /* USER CODE END 1 */

@@ -53,8 +53,8 @@ SPI_HandleTypeDef hspi1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
-void MX_RTC_Init(void);
 static void EXTI4_IRQHandler_Config(void);
 
 /* USER CODE END PFP */
@@ -91,8 +91,8 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_SPI1_Init();
+  //MX_GPIO_Init();
+  //MX_SPI1_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   MX_SubGHz_Phy_Init();
@@ -183,7 +183,7 @@ void SystemClock_Config(void)
   * @param None
   * @retval None
   */
-void MX_RTC_Init(void)
+static void MX_RTC_Init(void)
 {
 
   /* USER CODE BEGIN RTC_Init 0 */
