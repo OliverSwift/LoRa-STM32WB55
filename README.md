@@ -1,5 +1,7 @@
 # LoRa Shield and STM32WB55
 
+Project status: Ping Pong SubGhzPhy application works.
+
 ## Goal
 The main idea is to be able to use Semtech LoRa SX1272 shield on a STM32WB55 Nucleo board. Unfortunately code available by ST ([I-CUBE-LRWAN](https://www.st.com/en/embedded-software/i-cube-lrwan.html)) for this shield is only available for a few Nucleo boards (L053RG, L073RZ, L152RE and L476RG).
 
