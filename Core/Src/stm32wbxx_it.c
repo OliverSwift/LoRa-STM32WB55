@@ -224,9 +224,14 @@ void EXTI15_10_IRQHandler(void)
   // TODO
   // Check which DIO pin triggered the interrupt
   // then call the handler with corresponding pin info
-  //HAL_EXTI_IRQHandler(&H_EXTI_DIO1);
-  //HAL_EXTI_IRQHandler(&H_EXTI_DIO2);
-  //HAL_EXTI_IRQHandler(&H_EXTI_DIO3);
+	if (HAL_GPIO_ReadPin(RADIO_DIO_2_PORT, RADIO_DIO_2_PIN) == GPIO_PIN_SET) {
+		  HAL_EXTI_IRQHandler(&H_EXTI_DIO2);
+	} else
+	if (HAL_GPIO_ReadPin(RADIO_DIO_3_PORT, RADIO_DIO_3_PIN) == GPIO_PIN_SET) {
+		  HAL_EXTI_IRQHandler(&H_EXTI_DIO3);
+	} else {
+		HAL_EXTI_IRQHandler(&H_EXTI_DIO1);
+	}
 #endif
 }
 

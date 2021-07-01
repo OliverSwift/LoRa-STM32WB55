@@ -85,7 +85,7 @@ extern "C" {
 #define RADIO_DIO_2_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOC_CLK_ENABLE()
 #define RADIO_DIO_2_EXTI_LINE             EXTI_LINE_10
 #define RADIO_DIO_2_IRQn                  EXTI15_10_IRQn
-#define H_EXTI_DI02                       hRADIO_DIO_exti[2]
+#define H_EXTI_DIO2                       hRADIO_DIO_exti[2]
 
 #define RADIO_DIO_3_PORT                  GPIOA
 #define RADIO_DIO_3_PIN                   GPIO_PIN_15

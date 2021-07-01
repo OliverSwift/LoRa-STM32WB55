@@ -97,9 +97,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
   MX_SubGHz_Phy_Init();
 
+  BSP_LED_Init(LED_RED);
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Init(LED_BLUE);
   EXTI4_IRQHandler_Config();
+
+  BSP_LED_On(LED_BLUE);
 
   /* USER CODE END 2 */
 
@@ -116,6 +119,7 @@ int main(void)
 #endif
   while(1) {
 	  MX_SubGHz_Phy_Process();
+	  BSP_LED_Toggle(LED_BLUE);
   }
   /* USER CODE END 3 */
 }
