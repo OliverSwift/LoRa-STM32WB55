@@ -58,7 +58,7 @@ STMicro provides a software expansion package for some LoRa shields. As linked a
 
 ### Technical achievements
 #### Ping Pong SubGhzPhy example application
-That was the very first setp. Making things work and I chose the low level RF transmission example for that.
+That was the very first step. Making things work and I chose the low level RF transmission example for that.
 Porting the ST/Semtech code was a matter of dealing with reconfiguring the WB55 to:
 - match the shield PIN out (DIOx and SPI)
 - properly set clocks
@@ -79,7 +79,18 @@ MISO|PA6|D12
 MOSI|PA7|D11
 RESET|PC0|A0
 
-So nothing incompatible at first look. SPI1 matches, NSS and Reset pins are ok too. But here comes the first hickup with the IRQ lines.
+So nothing incompatible at first look. SPI1 pin set matches, NSS and Reset pins are ok too. But here comes the first hickup with the IRQ lines.
 PC6 uses the EXTI6 IRQ line (EXTI9_5_IRQn), that's fine, but PA10,PC10 and PA15 share the same EXTI IRQ line, that is EXTI15_10_IRQn.
+
+So the radio interface definition has been modifies to match the Nucleo-WB55 board ([sx1272mb2das_conf.h](Drivers/SX1272/sx1272mb2das_conf.h)). And the IRQ handlers have been modified to check GPIO (DIOx) states prior to calling corresponding SX1271 IRQ handler (check out [stm32wbxx_it.c](Core/Src/stm32wbxx_it.c) source file)
+
+RTC has clock source set to LSE.
+
+Original project file layout has also been slightly modified. The integration of the original files has been made on a MX generated project (sx1272.ioc) to preserve possibility to change the project. However, some cautious should be taken as **conflicting code** maybe generated. I removed the GPIO, SPI1 and RTC initialization routines being called in main where everything is redefined in the original code. Otherwise the module freezes.
+
+Programming two boards with this code works, and as expected the first board that receives a PONG response to a PING message becomes _master_ the other becomes _slave_. I made the LED status reflect this (as formerly planned in the original code). One is blinking red where the other has the green LED blinking after a short time: [VIDEO](https://debon.org/SX1272/sx1272_ping_pong.mp4).
+
+#### BLE stack integration
+That is a major step and IN PROGRESS at the moment.
 
 _to be continued_
