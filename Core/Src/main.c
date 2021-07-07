@@ -41,10 +41,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-RTC_HandleTypeDef hrtc;
-
-SPI_HandleTypeDef hspi1;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
