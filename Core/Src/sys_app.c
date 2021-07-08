@@ -138,6 +138,7 @@ void SystemApp_Init(void)
   * @param none
   * @retval  none
   */
+#if 0
 void UTIL_SEQ_Idle(void)
 {
   /* USER CODE BEGIN UTIL_SEQ_Idle_1 */
@@ -148,6 +149,7 @@ void UTIL_SEQ_Idle(void)
 
   /* USER CODE END UTIL_SEQ_Idle_2 */
 }
+#endif
 
 /* USER CODE BEGIN ExF */
 

@@ -38,6 +38,7 @@ extern "C" {
   * Supported requester to the MCU Low Power Manager - can be increased up  to 32
   * It lists a bit mapping of all user of the Low Power Manager
   */
+#if 0
 typedef enum
 {
   CFG_LPM_APPLI_Id,
@@ -48,6 +49,7 @@ typedef enum
 
   /* USER CODE END CFG_LPM_Id_t */
 } CFG_LPM_Id_t;
+#endif
 
 /*---------------------------------------------------------------------------*/
 /*                             sequencer definitions                         */

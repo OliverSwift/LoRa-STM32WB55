@@ -21,7 +21,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <math.h>
-#include "main.h" /*for Mx generated RTC_N_PREDIV_S and RTC_N_PREDIV_A*/
 #include "rtc.h"
 #include "rtc_if.h"
 #include "stm32_lpm.h"
@@ -93,7 +92,9 @@ typedef struct
 
 
 /* Calculates ceiling(X/N) */
+#ifndef DIVC
 #define DIVC(X,N)   ( ( (X) + (N) -1 ) / (N) )
+#endif
 
 /* #define RTIF_DEBUG */
 

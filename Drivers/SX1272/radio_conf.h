@@ -26,10 +26,11 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-//#include "platform.h"
+#include "platform.h"
 #include "mw_log_conf.h"     /* mw trace conf */
 #include "radio_board_if.h"  /* low layer api (bsp) */
 #include "utilities_conf.h"  /* low layer api (bsp) */
+#include "stm32_mem.h"
 //#include "sys_debug.h"
 /* USER CODE BEGIN include */
 

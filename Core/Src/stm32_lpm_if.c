@@ -1,41 +1,32 @@
+/* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file    stm32_lpm_if.c
-  * @author  MCD Application Team
-  * @brief   Low layer function to enter/exit low power modes (stop, sleep)
-  ******************************************************************************
+ ***************************************************************************************
+  * File Name          : stm32_lpm_if.c
+  * Description        : Low layer function to enter/exit low power modes (stop, sleep).
+ ***************************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * This software component is licensed by ST under Ultimate Liberty license
-  * SLA0044, the "License"; You may not use this file except in compliance with
-  * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-//#include "sys_debug.h"
 #include "stm32_lpm_if.h"
-//#include "usart_if.h"
-#include "radio_board_if.h"
+#include "stm32_lpm.h"
+#include "app_conf.h"
+/* USER CODE BEGIN include */
 
-/* USER CODE BEGIN Includes */
+/* USER CODE END include */
 
-/* USER CODE END Includes */
-
-/* External variables ---------------------------------------------------------*/
-/* USER CODE BEGIN EV */
-
-/* USER CODE END EV */
-
-/* Private typedef -----------------------------------------------------------*/
-/**
-  * @brief Power driver callbacks handler
-  */
+/* Exported variables --------------------------------------------------------*/
 const struct UTIL_LPM_Driver_s UTIL_PowerDriver =
 {
   PWR_EnterSleepMode,
@@ -48,128 +39,127 @@ const struct UTIL_LPM_Driver_s UTIL_PowerDriver =
   PWR_ExitOffMode,
 };
 
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
 /* Private function prototypes -----------------------------------------------*/
-/* USER CODE BEGIN PFP */
+static void Switch_On_HSI( void );
+/* USER CODE BEGIN Private_Function_Prototypes */
 
-/* USER CODE END PFP */
+/* USER CODE END Private_Function_Prototypes */
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN Private_Typedef */
 
-/* Exported functions --------------------------------------------------------*/
+/* USER CODE END Private_Typedef */
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN Private_Define */
 
-void PWR_EnterOffMode(void)
+/* USER CODE END Private_Define */
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN Private_Macro */
+
+/* USER CODE END Private_Macro */
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN Private_Variables */
+
+/* USER CODE END Private_Variables */
+
+/* Functions Definition ------------------------------------------------------*/
+/**
+  * @brief Enters Low Power Off Mode
+  * @param none
+  * @retval none
+  */
+void PWR_EnterOffMode( void )
 {
-  /* USER CODE BEGIN EnterOffMode_1 */
+/* USER CODE BEGIN PWR_EnterOffMode */
 
-  /* USER CODE END EnterOffMode_1 */
+/* USER CODE END PWR_EnterOffMode */
 }
 
-void PWR_ExitOffMode(void)
+/**
+  * @brief Exits Low Power Off Mode
+  * @param none
+  * @retval none
+  */
+void PWR_ExitOffMode( void )
 {
-  /* USER CODE BEGIN ExitOffMode_1 */
+/* USER CODE BEGIN PWR_ExitOffMode */
 
-  /* USER CODE END ExitOffMode_1 */
+/* USER CODE END PWR_ExitOffMode */
 }
 
-void PWR_EnterStopMode(void)
+/**
+  * @brief Enters Low Power Stop Mode
+  * @note ARM exists the function when waking up
+  * @param none
+  * @retval none
+  */
+void PWR_EnterStopMode( void )
 {
-  UTILS_ENTER_CRITICAL_SECTION();
+/* USER CODE BEGIN PWR_EnterStopMode */
 
-  Sx_Board_IoDeInit();
-
-  UTILS_EXIT_CRITICAL_SECTION();
-
-  /* Enter Stop Mode */
-  HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+/* USER CODE END PWR_EnterStopMode */
 }
 
-void PWR_ExitStopMode(void)
+/**
+  * @brief Exits Low Power Stop Mode
+  * @note Enable the pll at 32MHz
+  * @param none
+  * @retval none
+  */
+void PWR_ExitStopMode( void )
 {
-  /* Disable IRQ while the MCU is not running on PLL */
+/* USER CODE BEGIN PWR_ExitStopMode */
 
-  UTILS_ENTER_CRITICAL_SECTION();
-
-#if TODO
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  uint32_t pFLatency = 0;
-
-  /* In case nvic had a pending IT, the arm doesn't enter stop mode
-   * Hence the pll is not switched off and will cause HAL_RCC_OscConfig return
-    an error*/
-  if (__HAL_RCC_GET_SYSCLK_SOURCE() != RCC_CFGR_SWS_PLL)
-  {
-    /* Enable Power Control clock */
-    __HAL_RCC_PWR_CLK_ENABLE();
-
-    /* Get the Oscillators configuration according to the internal RCC registers */
-    HAL_RCC_GetOscConfig(&RCC_OscInitStruct);
-
-    /* Enable PLL */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_NONE;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
-      while (1);
-    }
-
-    /* Get the Clocks configuration according to the internal RCC registers */
-    HAL_RCC_GetClockConfig(&RCC_ClkInitStruct, &pFLatency);
-
-    /* Select PLL as system clock source and keep HCLK, PCLK1 and PCLK2 clocks dividers as before */
-    RCC_ClkInitStruct.ClockType     = RCC_CLOCKTYPE_SYSCLK;
-    RCC_ClkInitStruct.SYSCLKSource  = RCC_SYSCLKSOURCE_PLLCLK;
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, pFLatency) != HAL_OK)
-    {
-      while (1);
-    }
-  }
-  else
-  {
-    /*mcu did not enter stop mode because NVIC had a pending IT*/
-  }
-#endif
-
-  /* initializes the peripherals */
-  Sx_Board_IoInit();
-
-  UTILS_EXIT_CRITICAL_SECTION();
+/* USER CODE END PWR_ExitStopMode */
 }
 
-void PWR_EnterSleepMode(void)
+/**
+  * @brief Enters Low Power Sleep Mode
+  * @note ARM exits the function when waking up
+  * @param none
+  * @retval none
+  */
+void PWR_EnterSleepMode( void )
 {
-  HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+/* USER CODE BEGIN PWR_EnterSleepMode */
+
+/* USER CODE END PWR_EnterSleepMode */
 }
 
-void PWR_ExitSleepMode(void)
+/**
+  * @brief Exits Low Power Sleep Mode
+  * @note ARM exits the function when waking up
+  * @param none
+  * @retval none
+  */
+void PWR_ExitSleepMode( void )
 {
+/* USER CODE BEGIN PWR_ExitSleepMode */
+
+/* USER CODE END PWR_ExitSleepMode */
 }
 
-/* USER CODE BEGIN EF */
+/*************************************************************
+ *
+ * LOCAL FUNCTIONS
+ *
+ *************************************************************/
+/**
+  * @brief Switch the system clock on HSI
+  * @param none
+  * @retval none
+  */
+static void Switch_On_HSI( void )
+{
+  LL_RCC_HSI_Enable( );
+  while(!LL_RCC_HSI_IsReady( ));
+  LL_RCC_SetSysClkSource( LL_RCC_SYS_CLKSOURCE_HSI );
+  LL_RCC_SetSMPSClockSource(LL_RCC_SMPS_CLKSOURCE_HSI);
+  while (LL_RCC_GetSysClkSource( ) != LL_RCC_SYS_CLKSOURCE_STATUS_HSI);
+}
 
-/* USER CODE END EF */
+/* USER CODE BEGIN Private_Functions */
 
-/* Private Functions Definition -----------------------------------------------*/
-/* USER CODE BEGIN PrFD */
-
-/* USER CODE END PrFD */
+/* USER CODE END Private_Functions */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 
