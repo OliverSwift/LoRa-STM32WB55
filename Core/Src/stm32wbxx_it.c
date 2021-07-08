@@ -220,11 +220,6 @@ void RTC_Alarm_IRQHandler(void)
   * @param  None
   * @retval None
   */
-void EXTI4_IRQHandler(void)
-{
-  HAL_GPIO_EXTI_IRQHandler(BUTTON_SW1_PIN);
-}
-
 void EXTI9_5_IRQHandler(void)
 {
 #if (defined(SX1276MB1MAS) | defined(SX1276MB1LAS) | defined(SX1272MB2DAS))
@@ -235,7 +230,6 @@ void EXTI9_5_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
 #if (defined(SX1276MB1MAS) | defined(SX1276MB1LAS) | defined(SX1272MB2DAS))
-  // TODO
   // Check which DIO pin triggered the interrupt
   // then call the handler with corresponding pin info
 	if (HAL_GPIO_ReadPin(RADIO_DIO_2_PORT, RADIO_DIO_2_PIN) == GPIO_PIN_SET) {

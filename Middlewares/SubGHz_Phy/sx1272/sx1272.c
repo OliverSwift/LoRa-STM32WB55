@@ -43,7 +43,6 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-//#include "sys_debug.h"
 #include "timer.h"
 #include "radio.h"
 #include "sx1272.h"
