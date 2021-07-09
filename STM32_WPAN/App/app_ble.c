@@ -34,7 +34,6 @@
 #include "stm32_lpm.h"
 #include "otp.h"
 #include "dis_app.h"
-#include "hrs_app.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -244,11 +243,11 @@ static void Ble_Tl_Init( void );
 static void Ble_Hci_Gap_Gatt_Init(void);
 static const uint8_t* BleGetBdAddress( void );
 static void Adv_Request( APP_BLE_ConnStatus_t New_Status );
-static void Add_Advertisment_Service_UUID( uint16_t servUUID );
 static void Adv_Mgr( void );
 static void Adv_Update( void );
 
 /* USER CODE BEGIN PFP */
+static void AdjustLocalName(void);
 
 /* USER CODE END PFP */
 
@@ -256,6 +255,11 @@ static void Adv_Update( void );
 void APP_BLE_Init( void )
 {
 /* USER CODE BEGIN APP_BLE_Init_1 */
+  /**
+   * Adjust Local name with UDN
+   */
+  AdjustLocalName();
+
 
 /* USER CODE END APP_BLE_Init_1 */
   SHCI_C2_Ble_Init_Cmd_Packet_t ble_init_cmd_packet =
@@ -339,11 +343,6 @@ void APP_BLE_Init( void )
   DISAPP_Init();
 
   /**
-   * Initialize HRS Application
-   */
-  HRSAPP_Init();
-
-  /**
    * Create timer to handle the connection state machine
    */
 
@@ -354,7 +353,6 @@ void APP_BLE_Init( void )
    */
   BleApplicationContext.BleApplicationContext_legacy.advtServUUID[0] = AD_TYPE_16_BIT_SERV_UUID;
   BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen = 1;
-  Add_Advertisment_Service_UUID(HEART_RATE_SERVICE_UUID);
   /* Initialize intervals for reconnexion without intervals update */
   AdvIntervalMin = CFG_FAST_CONN_ADV_INTERVAL_MIN;
   AdvIntervalMax = CFG_FAST_CONN_ADV_INTERVAL_MAX;
@@ -404,6 +402,8 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
       Adv_Request(APP_BLE_FAST_ADV);
 
       /* USER CODE BEGIN EVT_DISCONN_COMPLETE */
+      BSP_LED_Off(LED_BLUE);
+
 
       /* USER CODE END EVT_DISCONN_COMPLETE */
     }
@@ -483,6 +483,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification( void *pckt )
           }
           BleApplicationContext.BleApplicationContext_legacy.connectionHandle = connection_complete_event->Connection_Handle;
           /* USER CODE BEGIN HCI_EVT_LE_CONN_COMPLETE */
+          BSP_LED_On(LED_BLUE);
 
           /* USER CODE END HCI_EVT_LE_CONN_COMPLETE */
         }
@@ -863,18 +864,6 @@ const uint8_t* BleGetBdAddress( void )
  *SPECIFIC FUNCTIONS
  *
  *************************************************************/
-static void Add_Advertisment_Service_UUID( uint16_t servUUID )
-{
-  BleApplicationContext.BleApplicationContext_legacy.advtServUUID[BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen] =
-      (uint8_t) (servUUID & 0xFF);
-  BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen++;
-  BleApplicationContext.BleApplicationContext_legacy.advtServUUID[BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen] =
-      (uint8_t) (servUUID >> 8) & 0xFF;
-  BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen++;
-
-  return;
-}
-
 static void Adv_Mgr( void )
 {
   /**
@@ -976,6 +965,21 @@ void SVCCTL_ResumeUserEventFlow( void )
 }
 
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
+
+static void AdjustLocalName(void) {
+	  uint32_t udn;
+	  char *ptr = (char*)(&local_name[0])+sizeof(local_name)-4;
+
+	  udn = LL_FLASH_GetUDN();
+#define NIBBLE(val,pos) (((val >> (pos*4))) & 0xf)
+#define HEX(nib) ((nib) + 0x30 + (((nib)>9)?7:0))
+	  for(int n = 0; n < 4; n++) {
+		  char nib,hex;
+		  nib = NIBBLE(udn,n);
+		  hex = HEX(nib);
+		  ptr[n] = hex;
+	  }
+}
 
 /* USER CODE END FD_WRAP_FUNCTIONS */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

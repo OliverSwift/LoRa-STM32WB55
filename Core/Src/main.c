@@ -107,8 +107,6 @@ int main(void)
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Init(LED_BLUE);
 
-  //BSP_LED_On(LED_BLUE);
-
   /* USER CODE END 2 */
 
   /* Init code for STM32_WPAN */
