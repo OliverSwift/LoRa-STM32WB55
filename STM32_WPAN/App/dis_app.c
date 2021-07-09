@@ -210,6 +210,8 @@ void DISAPP_Init(void)
   dis_information_data.Length = BLE_CFG_DIS_PNP_ID_LEN_MAX;
   DIS_UpdateChar(PNP_ID_UUID, &dis_information_data);
 #endif
+
+/* USER CODE END DISAPP_Init */
 }
 
 /* USER CODE BEGIN FD */

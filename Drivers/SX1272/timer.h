@@ -77,7 +77,7 @@ typedef struct _timerObject {
   * @brief update the period and start the timer
   */
 #define TimerSetValue(HANDLE, TIMEOUT) do{ \
-										   (HANDLE)->value = TIMEOUT; \
+										   (HANDLE)->value = (TIMEOUT); \
                                            /* UTIL_TIMER_SetPeriod(HANDLE, TIMEOUT);*/\
                                          } while(0)
 
@@ -85,7 +85,7 @@ typedef struct _timerObject {
   * @brief Start and adds the timer object to the list of timer events
   */
 #define TimerStart(HANDLE)   do {\
-								  HW_TS_Start((HANDLE)->id,(HANDLE)->value); \
+								  HW_TS_Start((HANDLE)->id,(HANDLE)->value*1000/CFG_TS_TICK_VAL); \
                                   /*UTIL_TIMER_Start(HANDLE);*/\
                                 } while(0)
 

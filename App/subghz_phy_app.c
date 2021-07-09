@@ -38,7 +38,6 @@
 #include "radio.h"
 #include "radio_board_if.h"
 #include "stm32_seq.h"
-#include "utilities_def.h"
 #include "app_version.h"
 
 /* USER CODE BEGIN Includes */
@@ -168,7 +167,7 @@ void SubghzApp_Init(void)
 
   /* Led Timers*/
   HW_TS_Create(0, &timerLed, hw_ts_SingleShot, (HW_TS_pTimerCb_t)OnledEvent);
-  HW_TS_Start(timerLed, LED_PERIOD_MS);
+  HW_TS_Start(timerLed, LED_PERIOD_MS*1000/CFG_TS_TICK_VAL);
 
   /* Radio initialization */
   RadioEvents.TxDone = OnTxDone;
@@ -403,7 +402,7 @@ static void OnTxDone(void)
 
   Radio.Sleep();
   State = TX;
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SEQ_Prio_0);
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SCH_PRIO_0);
   /* USER CODE BEGIN OnTxDone_2 */
 
   /* USER CODE END OnTxDone_2 */
@@ -423,7 +422,7 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
   RssiValue = rssi;
   SnrValue = snr;
   State = RX;
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SEQ_Prio_0);
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SCH_PRIO_0);
 
   /* USER CODE BEGIN OnRxDone_2 */
 
@@ -439,7 +438,7 @@ static void OnTxTimeout(void)
 
   Radio.Sleep();
   State = TX_TIMEOUT;
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SEQ_Prio_0);
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SCH_PRIO_0);
   /* USER CODE BEGIN OnTxTimeout_2 */
 
   /* USER CODE END OnTxTimeout_2 */
@@ -454,7 +453,7 @@ static void OnRxTimeout(void)
 
   Radio.Sleep();
   State = RX_TIMEOUT;
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SEQ_Prio_0);
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SCH_PRIO_0);
   /* USER CODE BEGIN OnRxTimeout_2 */
 
   /* USER CODE END OnRxTimeout_2 */
@@ -469,7 +468,7 @@ static void OnRxError(void)
 
   Radio.Sleep();
   State = RX_ERROR;
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SEQ_Prio_0);
+  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_PingPong_Process), CFG_SCH_PRIO_0);
   /* USER CODE BEGIN OnRxError_2 */
 
   /* USER CODE END OnRxError_2 */
@@ -483,7 +482,7 @@ static void OnledEvent(void *context)
   LED_Toggle(LED_GREEN);
   LED_Toggle(LED_RED);
 
-  HW_TS_Start(timerLed, LED_PERIOD_MS);
+  HW_TS_Start(timerLed, LED_PERIOD_MS*1000/CFG_TS_TICK_VAL);
   /* USER CODE BEGIN OnledEvent_2 */
 
   /* USER CODE END OnledEvent_2 */
