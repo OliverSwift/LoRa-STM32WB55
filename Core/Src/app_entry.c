@@ -78,7 +78,6 @@ void APPE_Init( void )
 {
   SystemPower_Config(); /**< Configure the system Power Mode */
 
-  // Already initialized
   //HW_TS_Init(hw_ts_InitMode_Full, &hrtc); /**< Initialize the TimerServer */
 
 /* USER CODE BEGIN APPE_Init_1 */
