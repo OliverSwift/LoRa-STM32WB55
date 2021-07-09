@@ -101,7 +101,7 @@ int main(void)
   MX_SPI1_Init();
   MX_RF_Init();
   /* USER CODE BEGIN 2 */
-  //MX_SubGHz_Phy_Init();
+  MX_SubGHz_Phy_Init();
 
   BSP_LED_Init(LED_RED);
   BSP_LED_Init(LED_GREEN);
@@ -112,7 +112,7 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Init code for STM32_WPAN */
-  APPE_Init();
+  //APPE_Init();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)

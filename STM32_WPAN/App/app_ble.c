@@ -215,7 +215,7 @@ PLACE_IN_SECTION("TAG_OTA_START") const uint32_t MagicKeywordAddress = (uint32_t
 PLACE_IN_SECTION("BLE_APP_CONTEXT") static BleApplicationContext_t BleApplicationContext;
 PLACE_IN_SECTION("BLE_APP_CONTEXT") static uint16_t AdvIntervalMin, AdvIntervalMax;
 
-static const char local_name[] = { AD_TYPE_COMPLETE_LOCAL_NAME ,'L','O','R','A','_'};
+static const char local_name[] = { AD_TYPE_COMPLETE_LOCAL_NAME ,'L','O','R','A','-','X','X','X','X'};
 uint8_t  manuf_data[14] = {
     sizeof(manuf_data)-1, AD_TYPE_MANUFACTURER_SPECIFIC_DATA,
     0x01/*SKD version */,

@@ -33,7 +33,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "platform.h"
-#include "stm32_timer.h"
 #include "sys_app.h"
 #include "subghz_phy_app.h"
 #include "radio.h"
@@ -89,7 +88,7 @@ int8_t RssiValue = 0;
 int8_t SnrValue = 0;
 
 /* Led Timers objects*/
-static  UTIL_TIMER_Object_t timerLed;
+static  uint8_t timerLed;
 
 bool isMaster = true;
 
@@ -168,10 +167,8 @@ void SubghzApp_Init(void)
           (uint8_t)(__APP_VERSION >> __APP_VERSION_SUB1_SHIFT), (uint8_t)(__APP_VERSION >> __APP_VERSION_SUB2_SHIFT));
 
   /* Led Timers*/
-  UTIL_TIMER_Create(&timerLed, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnledEvent, NULL);
-  UTIL_TIMER_SetPeriod(&timerLed, LED_PERIOD_MS);
-
-  UTIL_TIMER_Start(&timerLed);
+  HW_TS_Create(0, &timerLed, hw_ts_SingleShot, (HW_TS_pTimerCb_t)OnledEvent);
+  HW_TS_Start(timerLed, LED_PERIOD_MS);
 
   /* Radio initialization */
   RadioEvents.TxDone = OnTxDone;
@@ -249,7 +246,7 @@ static void PingPong_Process(void)
         {
           if (strncmp((const char *)Buffer, (const char *)PongMsg, 4) == 0)
           {
-            UTIL_TIMER_Stop(&timerLed);
+            HW_TS_Stop(timerLed);
 
             LED_Off(LED_GREEN);
             /* Indicates on a LED that the received frame is a PONG */
@@ -304,7 +301,7 @@ static void PingPong_Process(void)
           if (strncmp((const char *)Buffer, (const char *)PingMsg, 4) == 0)
           {
             /* Indicates on a LED that the received frame is a PING */
-            UTIL_TIMER_Stop(&timerLed);
+            HW_TS_Stop(timerLed);
 
             LED_Off(LED_RED);
             LED_Toggle(LED_GREEN);
@@ -486,7 +483,7 @@ static void OnledEvent(void *context)
   LED_Toggle(LED_GREEN);
   LED_Toggle(LED_RED);
 
-  UTIL_TIMER_Start(&timerLed);
+  HW_TS_Start(timerLed, LED_PERIOD_MS);
   /* USER CODE BEGIN OnledEvent_2 */
 
   /* USER CODE END OnledEvent_2 */

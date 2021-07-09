@@ -25,8 +25,6 @@
 #include "stm32_seq.h"
 #include "stm32_systime.h"
 #include "stm32_lpm.h"
-#include "stm32_timer.h"
-#include "rtc_if.h"
 #include "utilities_def.h"
 
 /* USER CODE BEGIN Includes */
@@ -35,6 +33,7 @@
 
 /* External variables ---------------------------------------------------------*/
 /* USER CODE BEGIN EV */
+extern RTC_HandleTypeDef hrtc;
 
 /* USER CODE END EV */
 
@@ -97,7 +96,7 @@ void SystemApp_Init(void)
   /* USER CODE END SystemApp_Init_1 */
 
   /*Initialises timer and RTC*/
-  UTIL_TIMER_Init();
+  HW_TS_Init(hw_ts_InitMode_Full, &hrtc); /**< Initialize the TimerServer */
 
   //Gpio_PreInit();
 
