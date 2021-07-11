@@ -47,7 +47,7 @@ Of course, buying two of each is a bit necessary for Ping Pong.
 
 ## Software
 ### Licenses
-99% of the code are covered by ST and Semtech sublicensing. Check out respective agreements for proper use:
+Major part of the code are covered by ST and Semtech sublicensing. Check out respective agreements for proper use:
 - [ST License agreement SLA0044](https://www.st.com/content/ccc/resource/legal/legal_agreement/license_agreement/group0/39/50/32/6c/e0/a8/45/2d/DM00218346/files/DM00218346.pdf/jcr:content/translations/en.DM00218346.pdf)
 - [BSD Revised Licensed for Semtech parts](/Middlewares/SubGHz_Phy/LICENSE.txt)
 
@@ -59,7 +59,7 @@ STMicro provides a software expansion package for some LoRa shields. As linked a
 
 The project can easily be open in STM32CudeIDE without dependencies. All code is there no need to install WB or LoRaWAN firmare from ST. Open  the project and build it (tested on Linux and MacOS).
 
-The whole experiment needed some extra tools. I used the mighty [nRF52840 USB Dongle](https://www.nordicsemi.com/Products/Development-hardware/nRF52840-Dongle) with [NRF Connect For Desktop 3.7.0](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-desktop) (available on Linux, Mac and Windows) from Nordic Semiconductor to test BLE connection. I know that smartphones can do that, I use [LightBlue](https://punchthrough.com/lightblue/) on iOS or Android, but when you mess about UUIDs or Device names the platforms tend to become lost whith their cached data, so I like to figure out what's going on with development tools like Nordic's ones.
+The whole experiment needed some extra tools. I used the mighty [nRF52840 USB Dongle](https://www.nordicsemi.com/Products/Development-hardware/nRF52840-Dongle) with [NRF Connect For Desktop 3.7.0](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-desktop) (available on Linux, Mac and Windows) from Nordic Semiconductor to test BLE connection. I know that smartphones can do that, I use [LightBlue](https://punchthrough.com/lightblue/) on iOS or Android, but when you mess about UUIDs or Device names the platforms tend to become lost whith their cached data, so I like to figure out what's going on with development tools like Nordic ones.
 
 For the LoRaWAN part, although TTN is great I preferred to buy an inexpensive LoRaWAN gateway a TTIG (cheaper than RAK hats for Raspberry Pi).
 
@@ -98,18 +98,23 @@ Original project file layout has also been slightly modified. The integration of
 Programming two boards with this code works, and as expected the first board that receives a PONG response to a PING message becomes _master_ the other becomes _slave_. I made the LED status reflect this (as formerly planned in the original code). One is blinking red where the other has the green LED blinking after a short time: [VIDEO](https://debon.org/SX1272/sx1272_ping_pong.mp4).
 
 #### BLE stack integration
-The BLE code is a complete MX generated one. Having one that works right away wasn't straightforward as many things have to be properly set in the MX project (that could a seperate article). I setup a BLE test project seperately for that purpose, once it worked I merged the code into the LoRa project to make the two run side by side.
+The BLE code is a completely MX generated one. Having one that works right away wasn't straightforward as many things have to be properly set in the MX project (that could a seperate article). I setup a BLE test project seperately for that purpose, once it worked I merged the code into the LoRa project to make the two run side by side.
 
-So the BLE test software is just a HRS (Heart Rate Sensor) peripheral code. It is based on a completely different timer framework which is called Hardware Timer Server (HW_TS). The Semtech LoRa library is not based on this one but on a stm32_timer utility, itself based on STM32 RTC driver. I removed the latter  (utility library and rtc driver) so the entire project relies on HW_TS only. The LoRa library actully relies on a abstraction API (timer.h) which was easy to rewrite so HW_TS is used instead. The Pin Pong application on the other hand relies on the former utility library. A few changes made on that part made the whole code rely on HW_TS only.
+So the BLE test software is just a HRS (Heart Rate Sensor) peripheral code. It is based on a completely different timer framework which is called Hardware Timer Server (HW_TS). The Semtech LoRa library is not based on this one but on a stm32_timer utility, itself based on the HAL RTC driver. I removed the  utility library and RTC adapter so the entire project relies on HW_TS only. The LoRa library actually relies on an intermediate API (timer.h) which was easy to rewrite so HW_TS is used instead. The Ping Pong application on the other hand relies on the former utility library. A few changes made on that part made the whole code rely on HW_TS only.
 
-I need to merge the TaskIds defined by Ping Pong application and the BLE code. Luckly the two use the stm32_sequencer utility. Once properly done I could successfully have the LoRa Pin Pong application AND a HRS BLE application running concurret-ntly and flawlessly on the STM32WB55 board.
+I need to merge the TaskIds defined by Ping Pong application and the BLE code. Fortunately the two use the _stm32_sequencer_ utility. Once properly done I successfully made the LoRa Ping Pong application **and** a HRS BLE application running concurrently and flawlessly on the STM32WB55 board.
 
-I modified the [app_ble.c](STM32_WPAN/App/app_ble.c) code so the advertized (visible) name is based on STM32 UDN so you can distinguish two boards running at the same time.
+I modified the [app_ble.c](STM32_WPAN/App/app_ble.c) code so the advertized (visible) name is based on STM32 UDN so we can distinguish boards running at the same time.
 
-For a useful demo, I wrote a dedicated GATT service so both boards could be interrogated via BLE so you can know which role the LoRa node has (master or slave) and number of PING/PONG sent/received. For this I slightly adapted the BLE code so Blue LED reflects BLE connection state. The custom service (not generated by MX, it's too messy), has two characteristics, one to know node role (master or slave after PingPonc synchronization) and another one that is a counter of the received PING frames (slave node) or PONG frames (master node). Here is the screenshot of NRF Connect connected to the two synchronized boards: 
+For a useful demo, I wrote a dedicated GATT service so both boards could be interrogated via BLE so you can know which role the LoRa node has (master or slave) and number of PING/PONG sent/received. For this I slightly adapted the BLE code so Blue LED reflects BLE connection state. The custom service (not generated by MX, it's too messy), has two characteristics, one to know node role (master or slave after PingPong synchronization) and another one that is a counter of the received PING frames (slave node) or PONG frames (master node). Here is the screenshot of NRF Connect connected to the two synchronized boards: 
 
 That done, I preferred to spend some more time on a slightly different LoRa application controlled by BLE, which is the next step.
 
 #### Master/slave LoRa/BLE application
 
 _to be continued_
+
+## Credits
+- [@STMicroelectronics](https://github.com/STMicroelectronics)
+- [Semtech](https://www.semtech.com)
+- [@NordicSemiconductor](https://github.com/NordicSemiconductor)
