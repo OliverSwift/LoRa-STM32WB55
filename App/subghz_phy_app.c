@@ -41,7 +41,7 @@
 #include "app_version.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "gatt_service.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -90,6 +90,7 @@ int8_t SnrValue = 0;
 static  uint8_t timerLed;
 
 bool isMaster = true;
+int16_t counterValue = 0;
 
 /* Radio events function pointer */
 static RadioEvents_t RadioEvents;
@@ -250,6 +251,11 @@ static void PingPong_Process(void)
             LED_Off(LED_GREEN);
             /* Indicates on a LED that the received frame is a PONG */
             LED_Toggle(LED_RED);
+            counterValue++;
+            updateRole(isMaster);
+            updateSnr(SnrValue);
+            updateRSSI(RssiValue);
+            updateCounter(counterValue);
 
             /* Send the next PING frame */
             Buffer[0] = 'P';
@@ -304,6 +310,11 @@ static void PingPong_Process(void)
 
             LED_Off(LED_RED);
             LED_Toggle(LED_GREEN);
+            counterValue++;
+            updateRole(isMaster);
+            updateSnr(SnrValue);
+            updateRSSI(RssiValue);
+            updateCounter(counterValue);
 
             /* Send the reply to the PONG string */
             Buffer[0] = 'P';
@@ -360,6 +371,11 @@ static void PingPong_Process(void)
           Buffer[i] = i - 4;
         }
         APP_LOG(TS_ON, VLEVEL_L, "Master Tx start\n\r");
+
+        updateRole(isMaster);
+        updateSnr(SnrValue);
+        updateRSSI(RssiValue);
+        updateCounter(counterValue);
 
         Radio.SetChannel(RF_FREQUENCY);
         /* Add delay between TX and RX =

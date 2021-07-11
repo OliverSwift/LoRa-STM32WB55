@@ -33,7 +33,12 @@ extern "C" {
 /* External variables --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-void TestService_Init(void);
+void LoraService_Init(void);
+
+void updateRole(uint8_t master);
+void updateCounter(uint16_t counter);
+void updateRSSI(uint8_t rssi);
+void updateSnr(uint8_t snr);
 
 #ifdef __cplusplus
 }

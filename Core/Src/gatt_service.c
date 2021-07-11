@@ -2,7 +2,7 @@
 ******************************************************************************
 * @file    gatt_service.c
 * @author  O.Debon
-* @brief   BLE Test GATT Server
+* @brief   BLE Lora GATT Server
 ******************************************************************************
 */
 
@@ -14,22 +14,28 @@
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct{
-  uint16_t TestServiceHandle;
-  uint16_t LedStatusCharacteristicHandle;
-} TestServiceContext_t;
+  uint16_t LoraServiceHandle;
+  uint16_t RoleCharacteristicHandle;
+  uint16_t CountCharacteristicHandle;
+  uint16_t RSSICharacteristicHandle;
+  uint16_t SnrCharacteristicHandle;
+} LoraServiceContext_t;
 
 /* Private defines -----------------------------------------------------------*/
 /* My Very Own Service and Characteristics UUIDs */
 
-#define COPY_TEST_SERVICE_UUID(uuid_struct)                COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x00,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
-#define COPY_LEDSTATUS_CHARACTERISTIC_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x01,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_LORA_SERVICE_UUID(uuid_struct)            COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x00,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_ROLE_CHARACTERISTIC_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x01,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_COUNT_CHARACTERISTIC_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x02,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_RSSI_CHARACTERISTIC_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x03,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_SNR_CHARACTERISTIC_UUID(uuid_struct)      COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x04,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
 
 /** Max_Attribute_Records = 2*no_of_char + 1
   * service_max_attribute_record = 1 for My Very Own service +
   *                                2 for My Very Own Read characteristic +
   *                                
   */
-#define MY_VERY_OWN_SERVICE_MAX_ATT_RECORDS                3
+#define MY_VERY_OWN_SERVICE_MAX_ATT_RECORDS                9
 
 #define CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET              1
 
@@ -47,13 +53,13 @@ do {\
 /**
 * START of Section BLE_DRIVER_CONTEXT
 */
-PLACE_IN_SECTION("BLE_DRIVER_CONTEXT") static TestServiceContext_t testServiceContext;
+PLACE_IN_SECTION("BLE_DRIVER_CONTEXT") static LoraServiceContext_t loraServiceContext;
 
 /**
 * END of Section BLE_DRIVER_CONTEXT
 */
 /* Private function prototypes -----------------------------------------------*/
-static SVCCTL_EvtAckStatus_t TestService_EventHandler(void *pckt);
+static SVCCTL_EvtAckStatus_t LoraService_EventHandler(void *pckt);
 
 /* Functions Definition ------------------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -63,7 +69,7 @@ static SVCCTL_EvtAckStatus_t TestService_EventHandler(void *pckt);
 * @param  Event: Address of the buffer holding the Event
 * @retval Ack: Return whether the Event has been managed or not
 */
-static SVCCTL_EvtAckStatus_t TestService_EventHandler(void *Event)
+static SVCCTL_EvtAckStatus_t LoraService_EventHandler(void *Event)
 {
   SVCCTL_EvtAckStatus_t return_value;
   hci_event_pckt *event_pckt;
@@ -84,7 +90,8 @@ static SVCCTL_EvtAckStatus_t TestService_EventHandler(void *Event)
       {
       case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blue_evt->data;
-        if(attribute_modified->Attr_Handle == (testServiceContext.LedStatusCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET))
+        /*
+        if(attribute_modified->Attr_Handle == (loraServiceContext.LedStatusCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET))
         {
         	if (attribute_modified->Attr_Data[0]) {
                 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
@@ -93,6 +100,7 @@ static SVCCTL_EvtAckStatus_t TestService_EventHandler(void *Event)
         	}
         	return_value = SVCCTL_EvtAckFlowEnable;
         }
+        */
 
         break;
         
@@ -116,7 +124,7 @@ static SVCCTL_EvtAckStatus_t TestService_EventHandler(void *Event)
 * @param  None
 * @retval None
 */
-void TestService_Init(void)
+void LoraService_Init(void)
 {
   tBleStatus ret = BLE_STATUS_SUCCESS;
   Char_UUID_t  uuid16;
@@ -124,35 +132,89 @@ void TestService_Init(void)
   /**
   *	Register the event handler to the BLE controller
   */
-  SVCCTL_RegisterSvcHandler(TestService_EventHandler);
+  SVCCTL_RegisterSvcHandler(LoraService_EventHandler);
   
   /**
   *  Add LEDisplay Service
   */
-  COPY_TEST_SERVICE_UUID(uuid16.Char_UUID_128);
+  COPY_LORA_SERVICE_UUID(uuid16.Char_UUID_128);
   ret = aci_gatt_add_service(UUID_TYPE_128,
                        (Service_UUID_t *) &uuid16,
                        PRIMARY_SERVICE,
                        MY_VERY_OWN_SERVICE_MAX_ATT_RECORDS,
-                       &(testServiceContext.TestServiceHandle));
+                       &(loraServiceContext.LoraServiceHandle));
   if (ret != BLE_STATUS_SUCCESS)
   {
     Error_Handler(); /* UNEXPECTED */
   }
   
   /**
-  *  Add Led Status Characteristic
+  *  Add Role Characteristic
   */
-  COPY_LEDSTATUS_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
-  ret = aci_gatt_add_char(testServiceContext.TestServiceHandle,
+  COPY_ROLE_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
                     UUID_TYPE_128, &uuid16,
-                    19,
-                    CHAR_PROP_WRITE,
+                    1,
+                    CHAR_PROP_READ,
                     ATTR_PERMISSION_NONE,
-                    GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
+					GATT_DONT_NOTIFY_EVENTS, /* gattEvtMask */
                     10, /* encryKeySize */
-                    1, /* isVariable */
-                    &(testServiceContext.LedStatusCharacteristicHandle));
+                    0, /* isVariable */
+                    &(loraServiceContext.RoleCharacteristicHandle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    Error_Handler(); /* UNEXPECTED */
+  }
+
+  /**
+  *  Add Counter Characteristic
+  */
+  COPY_COUNT_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
+                    UUID_TYPE_128, &uuid16,
+                    2, /* uint16_t */
+                    CHAR_PROP_READ,
+                    ATTR_PERMISSION_NONE,
+					GATT_DONT_NOTIFY_EVENTS, /* gattEvtMask */
+                    10, /* encryKeySize */
+                    0, /* isVariable */
+                    &(loraServiceContext.CountCharacteristicHandle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    Error_Handler(); /* UNEXPECTED */
+  }
+
+  /**
+  *  Add RSSI Characteristic
+  */
+  COPY_RSSI_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
+                    UUID_TYPE_128, &uuid16,
+                    1,
+                    CHAR_PROP_READ,
+                    ATTR_PERMISSION_NONE,
+					GATT_DONT_NOTIFY_EVENTS, /* gattEvtMask */
+                    10, /* encryKeySize */
+                    0, /* isVariable */
+                    &(loraServiceContext.RSSICharacteristicHandle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    Error_Handler(); /* UNEXPECTED */
+  }
+
+  /**
+  *  Add Role Characteristic
+  */
+  COPY_SNR_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
+                    UUID_TYPE_128, &uuid16,
+                    1,
+                    CHAR_PROP_READ,
+                    ATTR_PERMISSION_NONE,
+					GATT_DONT_NOTIFY_EVENTS, /* gattEvtMask */
+                    10, /* encryKeySize */
+                    0, /* isVariable */
+                    &(loraServiceContext.SnrCharacteristicHandle));
   if (ret != BLE_STATUS_SUCCESS)
   {
     Error_Handler(); /* UNEXPECTED */
@@ -174,6 +236,69 @@ void TestService_Init(void)
   return;
 } /* MyVeryOwnService_Init() */
 
+void updateRole(uint8_t master) {
+	  tBleStatus ret = BLE_STATUS_SUCCESS;
+
+	  /* Initialize Duration */
+	  ret = aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
+	                                      loraServiceContext.RoleCharacteristicHandle,
+	                                      0, /* charValOffset */
+	                                      1, /* charValueLen */
+	                                      (uint8_t *) &master);
+	  if (ret != BLE_STATUS_SUCCESS)
+	  {
+	    Error_Handler(); /* UNEXPECTED */
+	  }
+}
+
+void updateCounter(uint16_t counter) {
+	  tBleStatus ret = BLE_STATUS_SUCCESS;
+
+	  /* Initialize Duration */
+	  ret = aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
+	                                      loraServiceContext.CountCharacteristicHandle,
+	                                      0, /* charValOffset */
+	                                      2, /* charValueLen */
+	                                      (uint8_t *) &counter);
+	  if (ret != BLE_STATUS_SUCCESS)
+	  {
+	    Error_Handler(); /* UNEXPECTED */
+	  }
+
+}
+
+void updateRSSI(uint8_t rssi) {
+	  tBleStatus ret = BLE_STATUS_SUCCESS;
+
+	  /* Initialize Duration */
+	  ret = aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
+	                                      loraServiceContext.RSSICharacteristicHandle,
+	                                      0, /* charValOffset */
+	                                      1, /* charValueLen */
+	                                      (uint8_t *) &rssi);
+	  if (ret != BLE_STATUS_SUCCESS)
+	  {
+	    Error_Handler(); /* UNEXPECTED */
+	  }
+
+}
+
+void updateSnr(uint8_t snr) {
+	  tBleStatus ret = BLE_STATUS_SUCCESS;
+
+	  /* Initialize Duration */
+	  ret = aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
+	                                      loraServiceContext.SnrCharacteristicHandle,
+	                                      0, /* charValOffset */
+	                                      1, /* charValueLen */
+	                                      (uint8_t *) &snr);
+	  if (ret != BLE_STATUS_SUCCESS)
+	  {
+	    Error_Handler(); /* UNEXPECTED */
+	  }
+
+}
+
 /*
  * Overrides the SVCCTL_SvcInit from svc_ctl.c in Middlewares/ST/STM32_WPAN/ble/svc
  * which is called by SVCCTL_Init called by APP_BLE_Init (app_ble.c)
@@ -181,6 +306,6 @@ void TestService_Init(void)
 
 void SVCCTL_SvcInit(void) {
 	  DIS_Init();
-	  TestService_Init();
+	  LoraService_Init();
 }
 

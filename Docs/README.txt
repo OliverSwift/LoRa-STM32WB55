@@ -33,3 +33,6 @@ Datasheet:
 SX1272:
     SX1272_DS_V4.pdf
     Source : https://semtech.my.salesforce.com/sfc/p/#E0000000JelG/a/440000001NCE/v_VBhk1IolDgxwwnOpcS_vTFxPfSEPQbuneK3mWsXlU
+
+Application note:
+    https://www.st.com/resource/en/application_note/dm00598033-building-wireless-applications-with-stm32wb-series-microcontrollers-stmicroelectronics.pdf
