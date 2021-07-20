@@ -25,7 +25,8 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-//#include "stm32_timer.h"
+#include "app_common.h"
+#include "app_conf.h"
 #include "hw_if.h"
 /* USER CODE BEGIN Includes */
 

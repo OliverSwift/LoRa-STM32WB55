@@ -89,7 +89,9 @@ extern "C"{
 
 #define DIVF( x, y )         ((x)/(y))
 
+#ifndef DIVC
 #define DIVC( x, y )         (((x)+(y)-1)/(y))
+#endif
 
 #define DIVR( x, y )         (((x)+((y)/2))/(y))
 
