@@ -98,15 +98,15 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_RTC_Init();
-  //MX_SPI1_Init();
-  //MX_RF_Init();
+  MX_SPI1_Init();
+  MX_RF_Init();
   /* USER CODE BEGIN 2 */
   MX_LoRaWAN_Init();
 
 
-  //BSP_LED_Init(LED_RED);
-  //BSP_LED_Init(LED_GREEN);
-  //BSP_LED_Init(LED_BLUE);
+  BSP_LED_Init(LED_RED);
+  BSP_LED_Init(LED_GREEN);
+  BSP_LED_Init(LED_BLUE);
 
   /* USER CODE END 2 */
 
