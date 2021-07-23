@@ -49,15 +49,18 @@ extern "C" {
 /* USER CODE END EV */
 
 /* Exported macros -----------------------------------------------------------*/
+#if defined (APP_LOG_ENABLED) && (APP_LOG_ENABLED == 1)
 #define APP_PPRINTF(...)  do{ } while( UTIL_ADV_TRACE_OK \
                               != UTIL_ADV_TRACE_COND_FSend(VLEVEL_ALWAYS, T_REG_OFF, TS_OFF, __VA_ARGS__) ) /* Polling Mode */
 #define APP_TPRINTF(...)   do{ {UTIL_ADV_TRACE_COND_FSend(VLEVEL_ALWAYS, T_REG_OFF, TS_ON, __VA_ARGS__);} }while(0); /* with timestamp */
 #define APP_PRINTF(...)   do{ {UTIL_ADV_TRACE_COND_FSend(VLEVEL_ALWAYS, T_REG_OFF, TS_OFF, __VA_ARGS__);} }while(0);
 
-#if defined (APP_LOG_ENABLED) && (APP_LOG_ENABLED == 1)
 #define APP_LOG(TS,VL,...)   do{ {UTIL_ADV_TRACE_COND_FSend(VL, T_REG_OFF, TS, __VA_ARGS__);} }while(0);
 #elif defined (APP_LOG_ENABLED) && (APP_LOG_ENABLED == 0) /* APP_LOG disabled */
 #define APP_LOG(TS,VL,...)
+#define APP_PPRINTF(...)
+#define APP_TPRINTF(...)
+#define APP_PRINTF(...)
 #else
 #error "APP_LOG_ENABLED not defined or out of range <0,1>"
 #endif /* APP_LOG_ENABLED */
@@ -78,6 +81,20 @@ extern "C" {
   * @retval  none
   */
 void SystemApp_Init(void);
+
+/**
+  * @brief  callback to get the board 64 bits unique ID
+  * @param  unique ID
+  * @retval none
+  */
+void GetUniqueId(uint8_t *id);
+
+/**
+  * @brief  callback to get the board 32 bits unique ID (LSB)
+  * @param  none
+  * @retval devAddr Device Address
+  */
+uint32_t GetDevAddr(void);
 
 /* USER CODE BEGIN EFP */
 

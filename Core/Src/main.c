@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "app_subghz_phy.h"
+#include "app_lorawan.h"
 
 /* USER CODE END Includes */
 
@@ -89,7 +89,7 @@ int main(void)
   SystemClock_Config();
 
   /* IPCC initialisation */
-   MX_IPCC_Init();
+   //MX_IPCC_Init();
 
   /* USER CODE BEGIN SysInit */
 
@@ -98,19 +98,20 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_RTC_Init();
-  MX_SPI1_Init();
-  MX_RF_Init();
+  //MX_SPI1_Init();
+  //MX_RF_Init();
   /* USER CODE BEGIN 2 */
-  MX_SubGHz_Phy_Init();
+  MX_LoRaWAN_Init();
 
-  BSP_LED_Init(LED_RED);
-  BSP_LED_Init(LED_GREEN);
-  BSP_LED_Init(LED_BLUE);
+
+  //BSP_LED_Init(LED_RED);
+  //BSP_LED_Init(LED_GREEN);
+  //BSP_LED_Init(LED_BLUE);
 
   /* USER CODE END 2 */
 
   /* Init code for STM32_WPAN */
-  APPE_Init();
+  //APPE_Init();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -118,7 +119,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  MX_SubGHz_Phy_Process();
+	MX_LoRaWAN_Process();
   }
   /* USER CODE END 3 */
 }

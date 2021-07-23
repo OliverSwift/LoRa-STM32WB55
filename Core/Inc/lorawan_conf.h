@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 /* Includes ------------------------------------------------------------------*/
-#include "stm32_systime.h"
+#include "systime.h"
 #include "sys_app.h"   /* needed for APP_PRINTF */
 #include "utilities_conf.h"
 /* USER CODE BEGIN Includes */

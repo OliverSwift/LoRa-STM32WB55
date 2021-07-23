@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    app_subghz_phy.c
+  * @file    app_lorawan.c
   * @author  MCD Application Team
-  * @brief   Application of the SubGHz_Phy Middleware
+  * @brief   Application of the LRWAN Middleware
   ******************************************************************************
   * @attention
   *
@@ -18,11 +18,10 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "app_subghz_phy.h"
-#include "subghz_phy_app.h"
+#include "app_lorawan.h"
+#include "lora_app.h"
 #include "sys_app.h"
 #include "stm32_seq.h"
-
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -48,38 +47,43 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Exported functions --------------------------------------------------------*/
 
-void MX_SubGHz_Phy_Init(void)
+void MX_LoRaWAN_Init(void)
 {
-  /* USER CODE BEGIN MX_SubGHz_Phy_Init_1 */
+  /* USER CODE BEGIN MX_LoRaWAN_Init_1 */
 
-  /* USER CODE END MX_SubGHz_Phy_Init_1 */
+  /* USER CODE END MX_LoRaWAN_Init_1 */
   SystemApp_Init();
-  SubghzApp_Init();
-  /* USER CODE BEGIN MX_SubGHz_Phy_Init_2 */
+  /* USER CODE BEGIN MX_LoRaWAN_Init_2 */
 
-  /* USER CODE END MX_SubGHz_Phy_Init_2 */
+  /* USER CODE END MX_LoRaWAN_Init_2 */
+  LoRaWAN_Init();
+  /* USER CODE BEGIN MX_LoRaWAN_Init_3 */
+
+  /* USER CODE END MX_LoRaWAN_Init_3 */
 }
 
-void MX_SubGHz_Phy_Process(void)
+void MX_LoRaWAN_Process(void)
 {
-  /* USER CODE BEGIN MX_SubGHz_Phy_Process_1 */
+  /* USER CODE BEGIN MX_LoRaWAN_Process_1 */
 
-  /* USER CODE END MX_SubGHz_Phy_Process_1 */
+  /* USER CODE END MX_LoRaWAN_Process_1 */
   UTIL_SEQ_Run(UTIL_SEQ_DEFAULT);
-  /* USER CODE BEGIN MX_SubGHz_Phy_Process_2 */
+  /* USER CODE BEGIN MX_LoRaWAN_Process_2 */
 
-  /* USER CODE END MX_SubGHz_Phy_Process_2 */
+  /* USER CODE END MX_LoRaWAN_Process_2 */
 }
 
 /* USER CODE BEGIN EF */

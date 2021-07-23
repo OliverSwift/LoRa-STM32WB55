@@ -23,7 +23,7 @@
 #include "sys_app.h"
 #include "radio_board_if.h"
 #include "stm32_seq.h"
-#include "stm32_systime.h"
+#include "systime.h"
 #include "stm32_lpm.h"
 
 /* USER CODE BEGIN Includes */
@@ -148,6 +148,32 @@ void UTIL_SEQ_Idle(void)
   /* USER CODE END UTIL_SEQ_Idle_2 */
 }
 #endif
+void GetUniqueId(uint8_t *id)
+{
+  /* USER CODE BEGIN GetUniqueId_1 */
+
+  /* USER CODE END GetUniqueId_1 */
+  uint32_t ID_1_3_val = HAL_GetUIDw0() + HAL_GetUIDw2();
+  uint32_t ID_2_val = HAL_GetUIDw1();
+
+  id[7] = (ID_1_3_val) >> 24;
+  id[6] = (ID_1_3_val) >> 16;
+  id[5] = (ID_1_3_val) >> 8;
+  id[4] = (ID_1_3_val);
+  id[3] = (ID_2_val) >> 24;
+  id[2] = (ID_2_val) >> 16;
+  id[1] = (ID_2_val) >> 8;
+  id[0] = (ID_2_val);
+
+  /* USER CODE BEGIN GetUniqueId_2 */
+
+  /* USER CODE END GetUniqueId_2 */
+}
+
+uint32_t GetDevAddr(void)
+{
+  return ((HAL_GetUIDw0()) ^ (HAL_GetUIDw1()) ^ (HAL_GetUIDw2()));
+}
 
 /* USER CODE BEGIN ExF */
 
