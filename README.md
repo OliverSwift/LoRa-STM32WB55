@@ -130,7 +130,7 @@ The device is set to Join the network using OTAA, so 3 elements are needed: DevE
 
 Testing with TTN and TTIG gateway gives these:
 
-![Devices](/Docs/TTN-Devices.png)
+![Devices](/Docs/TTN-devices.png)
 
 For the declarative part.
 
