@@ -6,7 +6,7 @@
 - [x] **Ping Pong SubGhzPhy application**
 - [x] add BLE stack along with LoRa Ping Pong
 - [ ] Master/slave LoRa/BLE application
-- [ ] LoRaWAN example
+- [x] LoRaWAN example
 - [ ] LPM management
 
 ## Goal
@@ -48,8 +48,12 @@ Of course, buying two of each is a bit necessary for Ping Pong.
 ## Software
 ### Licenses
 Major part of the code are covered by ST and Semtech sublicensing. Check out respective agreements for proper use:
-- [ST License agreement SLA0044](https://www.st.com/content/ccc/resource/legal/legal_agreement/license_agreement/group0/39/50/32/6c/e0/a8/45/2d/DM00218346/files/DM00218346.pdf/jcr:content/translations/en.DM00218346.pdf)
-- [BSD Revised Licensed for Semtech parts](/Middlewares/SubGHz_Phy/LICENSE.txt)
+
+Component | Copyright | License
+----------|-----------|--------
+Original application source | STMicroelectronic | [ST License agreement SLA0044](https://www.st.com/content/ccc/resource/legal/legal_agreement/license_agreement/group0/39/50/32/6c/e0/a8/45/2d/DM00218346/files/DM00218346.pdf/jcr:content/translations/en.DM00218346.pdf)
+LoRaWAN® stacks | Semtech | [BSD Revised Licensed for Semtech parts](https://opensource.org/licenses/BSD-3-Clause)
+Cortex®-M CMSIS | ARM Ltd | [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause) or [Apache License 2](https://opensource.org/licenses/Apache-2.0)
 
 ### Development requirements
 My favorite development environment is Linux but ST tools are available for Mac and Windows as well. The first two are easier to setup, usually no issues or driver problems. Well, real tech savvy's know that already.
@@ -61,7 +65,7 @@ The project can easily be open in STM32CudeIDE without dependencies. All code is
 
 The whole experiment needed some extra tools. I used the mighty [nRF52840 USB Dongle](https://www.nordicsemi.com/Products/Development-hardware/nRF52840-Dongle) with [NRF Connect For Desktop 3.7.0](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-desktop) (available on Linux, Mac and Windows) from Nordic Semiconductor to test BLE connection. I know that smartphones can do that, I use [LightBlue](https://punchthrough.com/lightblue/) on iOS or Android, but when you mess about UUIDs or Device names the platforms tend to become lost whith their cached data, so I like to figure out what's going on with development tools like Nordic ones.
 
-For the LoRaWAN part, although TTN is great I preferred to buy an inexpensive LoRaWAN gateway a TTIG (cheaper than RAK hats for Raspberry Pi).
+For the LoRaWAN part, [TTN](https://www.thethingsnetwork.org/) is just great and I chose to buy an inexpensive LoRaWAN gateway, a TTIG (cheaper than RAK hats for Raspberry Pi) for local tests. The gateway is hardcoded to TTN services, but there must be a way to connect to your own LNS.
 
 ### Technical achievements
 #### Ping Pong SubGhzPhy example application
@@ -89,7 +93,7 @@ RESET|PC0|A0
 So nothing incompatible at first look. SPI1 pin set matches, NSS and Reset pins are ok too. But here comes the first hickup with the IRQ lines.
 PC6 uses the EXTI6 IRQ line (EXTI9_5_IRQn), that's fine, but PA10,PC10 and PA15 share the same EXTI IRQ line, that is EXTI15_10_IRQn.
 
-So the radio interface definition has been modifies to match the Nucleo-WB55 board ([sx1272mb2das_conf.h](Drivers/SX1272/sx1272mb2das_conf.h)). And the IRQ handlers have been modified to check GPIO (DIOx) states prior to calling corresponding SX1271 IRQ handler (check out [stm32wbxx_it.c](Core/Src/stm32wbxx_it.c) source file)
+So the radio interface definition has been modified to match the Nucleo-WB55 board ([sx1272mb2das_conf.h](Drivers/SX1272/sx1272mb2das_conf.h)). And the IRQ handlers have been modified to check GPIO (DIOx) states prior to calling corresponding SX1272 IRQ handlers (check out [stm32wbxx_it.c](Core/Src/stm32wbxx_it.c) source file)
 
 RTC has clock source set to LSE.
 
@@ -112,6 +116,17 @@ For a useful demo, I wrote a dedicated GATT service so both boards could be inte
 That done, I preferred to spend some more time on a slightly different LoRa application controlled by BLE, which is the next step.
 
 #### Master/slave LoRa/BLE application
+On hold for now.
+
+#### LoRaWAN stack integration
+The LoRaWAN stack is the one by Semtech provided in the [I-CUBE-LRWAN expansion package](https://www.st.com/en/embedded-software/i-cube-lrwan.html).
+It is 1.0.3 compliant and includes certification software package if LoRa compliance is needed for the final device.
+
+Again, the code relies on a different RTC wrapper than the BLE stack, so it has been been modified for that. The number of timers has been increased because initial HW TimerServer setting is too limited for running the two stckas concurrently (checkout hw_if.h file).
+
+The original example, LoRaWAN End Node, sends a very complete set of data, where I reduced the test frame to a simple text.
+
+The device is set to Join the network using OTAA, so 3 elements are needed: DevEUI, JoinEUI and APPKey. DevEUI is a unique identifier for a hardware device and is built from STM32 "serial number". The JoinEUI (or former AppEUI) identifier is used for applications segragation. The APPKey is very important (and AES128 key) that muts be kept very secretly. The source code arbitrary set it to a value that must be changed for final use. Secrecy is done by Semtech code using a Secure Element API, in our case it's a virtual SE but this very convenient if you happen to use an actual one.
 
 _to be continued_
 
