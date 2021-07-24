@@ -128,6 +128,16 @@ The original example, LoRaWAN End Node, sends a very complete set of data, where
 
 The device is set to Join the network using OTAA, so 3 elements are needed: DevEUI, JoinEUI and APPKey. DevEUI is a unique identifier for a hardware device and is built from STM32 "serial number". The JoinEUI (or former AppEUI) identifier is used for applications segragation. The APPKey is very important (and AES128 key) that muts be kept very secretly. The source code arbitrary set it to a value that must be changed for final use. Secrecy is done by Semtech code using a Secure Element API, in our case it's a virtual SE but this very convenient if you happen to use an actual one.
 
+Testing with TTN and TTIG gateway gives these:
+
+![Devices](/Docs/TTN-Devices.png)
+
+For the declarative part.
+
+![Live Data](/Docs/TTN-LiveData.png)
+
+Once the two boards had a positive reply from their respective JoinRequest.
+
 _to be continued_
 
 ## Credits
