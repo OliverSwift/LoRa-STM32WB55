@@ -89,7 +89,7 @@ int main(void)
   SystemClock_Config();
 
   /* IPCC initialisation */
-   //MX_IPCC_Init();
+  MX_IPCC_Init();
 
   /* USER CODE BEGIN SysInit */
 
@@ -111,7 +111,7 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Init code for STM32_WPAN */
-  //APPE_Init();
+  APPE_Init();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)

@@ -11,12 +11,16 @@
 #include "main.h"
 #include "ble.h"
 #include "gatt_service.h"
+#include "secure-element.h"
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct{
   uint16_t LoraServiceHandle;
-  uint16_t RoleCharacteristicHandle;
-  uint16_t CountCharacteristicHandle;
+  uint16_t StatusCharacteristicHandle;
+  uint16_t DevEUICharacteristicHandle;
+  uint16_t JoinEUICharacteristicHandle;
+  uint16_t DataCharacteristicHandle;
+  uint16_t PeriodCharacteristicHandle;
   uint16_t RSSICharacteristicHandle;
   uint16_t SnrCharacteristicHandle;
 } LoraServiceContext_t;
@@ -25,17 +29,20 @@ typedef struct{
 /* My Very Own Service and Characteristics UUIDs */
 
 #define COPY_LORA_SERVICE_UUID(uuid_struct)            COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x00,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
-#define COPY_ROLE_CHARACTERISTIC_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x01,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
-#define COPY_COUNT_CHARACTERISTIC_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x02,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
-#define COPY_RSSI_CHARACTERISTIC_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x03,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
-#define COPY_SNR_CHARACTERISTIC_UUID(uuid_struct)      COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x04,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_STATUS_CHARACTERISTIC_UUID(uuid_struct)   COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x01,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_DEVEUI_CHARACTERISTIC_UUID(uuid_struct)   COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x02,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_JOINEUI_CHARACTERISTIC_UUID(uuid_struct)  COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x03,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_DATA_CHARACTERISTIC_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x04,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_PERIOD_CHARACTERISTIC_UUID(uuid_struct)   COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x05,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_RSSI_CHARACTERISTIC_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x06,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
+#define COPY_SNR_CHARACTERISTIC_UUID(uuid_struct)      COPY_UUID_128(uuid_struct,0xcc,0x26,0x00,0x07,0xcf,0x94,0x4f,0xe8,0xb2,0x7c,0xce,0x7a,0x4d,0xc8,0x94,0x8d)
 
 /** Max_Attribute_Records = 2*no_of_char + 1
   * service_max_attribute_record = 1 for My Very Own service +
   *                                2 for My Very Own Read characteristic +
   *                                
   */
-#define MY_VERY_OWN_SERVICE_MAX_ATT_RECORDS                9
+#define MY_VERY_OWN_SERVICE_MAX_ATT_RECORDS                (1+7*2)
 
 #define CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET              1
 
@@ -90,18 +97,17 @@ static SVCCTL_EvtAckStatus_t LoraService_EventHandler(void *Event)
       {
       case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blue_evt->data;
-        /*
-        if(attribute_modified->Attr_Handle == (loraServiceContext.LedStatusCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET))
+        if(attribute_modified->Attr_Handle == (loraServiceContext.PeriodCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET))
         {
-        	if (attribute_modified->Attr_Data[0]) {
-                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
-        	} else {
-                HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-        	}
+        	uint16_t seconds;
+			seconds = *((uint16_t *)attribute_modified->Attr_Data);
+        	setLoraPeriod(seconds);
         	return_value = SVCCTL_EvtAckFlowEnable;
-        }
-        */
-
+        } else if(attribute_modified->Attr_Handle == (loraServiceContext.DataCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET))
+		{
+			setLoraData(attribute_modified->Attr_Data, attribute_modified->Attr_Data_Length);
+			return_value = SVCCTL_EvtAckFlowEnable;
+		}
         break;
         
       default:
@@ -149,9 +155,9 @@ void LoraService_Init(void)
   }
   
   /**
-  *  Add Role Characteristic
+  *  Add Status Characteristic
   */
-  COPY_ROLE_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  COPY_STATUS_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
   ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
                     UUID_TYPE_128, &uuid16,
                     1,
@@ -160,25 +166,79 @@ void LoraService_Init(void)
 					GATT_DONT_NOTIFY_EVENTS, /* gattEvtMask */
                     10, /* encryKeySize */
                     0, /* isVariable */
-                    &(loraServiceContext.RoleCharacteristicHandle));
+                    &(loraServiceContext.StatusCharacteristicHandle));
   if (ret != BLE_STATUS_SUCCESS)
   {
     Error_Handler(); /* UNEXPECTED */
   }
 
   /**
-  *  Add Counter Characteristic
+  *  Add DevEUI Characteristic
   */
-  COPY_COUNT_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  COPY_DEVEUI_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
   ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
                     UUID_TYPE_128, &uuid16,
-                    2, /* uint16_t */
+                    8, /* 8 * uint8_t */
                     CHAR_PROP_READ,
                     ATTR_PERMISSION_NONE,
 					GATT_DONT_NOTIFY_EVENTS, /* gattEvtMask */
                     10, /* encryKeySize */
                     0, /* isVariable */
-                    &(loraServiceContext.CountCharacteristicHandle));
+                    &(loraServiceContext.DevEUICharacteristicHandle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    Error_Handler(); /* UNEXPECTED */
+  }
+
+  /**
+  *  Add JoinEUI Characteristic
+  */
+  COPY_JOINEUI_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
+                    UUID_TYPE_128, &uuid16,
+                    8, /* 8 * uint8_t */
+                    CHAR_PROP_READ,
+                    ATTR_PERMISSION_NONE,
+					GATT_DONT_NOTIFY_EVENTS, /* gattEvtMask */
+                    10, /* encryKeySize */
+                    0, /* isVariable */
+                    &(loraServiceContext.JoinEUICharacteristicHandle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    Error_Handler(); /* UNEXPECTED */
+  }
+
+  /**
+  *  Add Data Characteristic
+  */
+  COPY_DATA_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
+                    UUID_TYPE_128, &uuid16,
+                    16, /* Max 16 bytes */
+                    CHAR_PROP_WRITE,
+                    ATTR_PERMISSION_NONE,
+					GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
+                    10, /* encryKeySize */
+                    1, /* isVariable */
+                    &(loraServiceContext.DataCharacteristicHandle));
+  if (ret != BLE_STATUS_SUCCESS)
+  {
+    Error_Handler(); /* UNEXPECTED */
+  }
+
+  /**
+  *  Add Period Characteristic
+  */
+  COPY_PERIOD_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
+  ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
+                    UUID_TYPE_128, &uuid16,
+                    2, /* uint16_t */
+                    CHAR_PROP_WRITE,
+                    ATTR_PERMISSION_NONE,
+					GATT_NOTIFY_ATTRIBUTE_WRITE, /* gattEvtMask */
+                    10, /* encryKeySize */
+                    0, /* isVariable */
+                    &(loraServiceContext.PeriodCharacteristicHandle));
   if (ret != BLE_STATUS_SUCCESS)
   {
     Error_Handler(); /* UNEXPECTED */
@@ -203,7 +263,7 @@ void LoraService_Init(void)
   }
 
   /**
-  *  Add Role Characteristic
+  *  Add SNR Characteristic
   */
   COPY_SNR_CHARACTERISTIC_UUID(uuid16.Char_UUID_128);
   ret = aci_gatt_add_char(loraServiceContext.LoraServiceHandle,
@@ -220,46 +280,69 @@ void LoraService_Init(void)
     Error_Handler(); /* UNEXPECTED */
   }
 
-#if 0
-  /* Initialize Duration */
-  ret = aci_gatt_update_char_value(leDisplayServiceContext.LeDisplayServiceHandle,
-                                      leDisplayServiceContext.DurationCharacteristicHandle,
+  /*
+   * Initializations
+   */
+  uint8_t *eui;
+
+  eui = SecureElementGetJoinEui();
+  aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
+                                      loraServiceContext.JoinEUICharacteristicHandle,
                                       0, /* charValOffset */
-                                      1, /* charValueLen */
-                                      (uint8_t *) &duration);
-  if (ret != BLE_STATUS_SUCCESS)
-  {
-    Error_Handler(); /* UNEXPECTED */
-  }
-#endif
+                                      8, /* charValueLen */
+                                      (uint8_t *) eui);
+
+  eui = SecureElementGetDevEui();
+  aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
+                                      loraServiceContext.DevEUICharacteristicHandle,
+                                      0, /* charValOffset */
+                                      8, /* charValueLen */
+                                      (uint8_t *) eui);
+
 
   return;
 } /* MyVeryOwnService_Init() */
 
-void updateRole(uint8_t master) {
+void updateStatus(uint8_t status) {
 	  tBleStatus ret = BLE_STATUS_SUCCESS;
 
 	  /* Initialize Duration */
 	  ret = aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
-	                                      loraServiceContext.RoleCharacteristicHandle,
+	                                      loraServiceContext.StatusCharacteristicHandle,
 	                                      0, /* charValOffset */
 	                                      1, /* charValueLen */
-	                                      (uint8_t *) &master);
+	                                      (uint8_t *) &status);
 	  if (ret != BLE_STATUS_SUCCESS)
 	  {
 	    Error_Handler(); /* UNEXPECTED */
 	  }
 }
 
-void updateCounter(uint16_t counter) {
+void updateDevEUI(uint8_t *deveui) {
 	  tBleStatus ret = BLE_STATUS_SUCCESS;
 
 	  /* Initialize Duration */
 	  ret = aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
-	                                      loraServiceContext.CountCharacteristicHandle,
+	                                      loraServiceContext.DevEUICharacteristicHandle,
 	                                      0, /* charValOffset */
-	                                      2, /* charValueLen */
-	                                      (uint8_t *) &counter);
+	                                      8, /* charValueLen */
+	                                      (uint8_t *) deveui);
+	  if (ret != BLE_STATUS_SUCCESS)
+	  {
+	    Error_Handler(); /* UNEXPECTED */
+	  }
+
+}
+
+void updateJoinEUI(uint8_t *joineui) {
+	  tBleStatus ret = BLE_STATUS_SUCCESS;
+
+	  /* Initialize Duration */
+	  ret = aci_gatt_update_char_value(loraServiceContext.LoraServiceHandle,
+	                                      loraServiceContext.JoinEUICharacteristicHandle,
+	                                      0, /* charValOffset */
+	                                      8, /* charValueLen */
+	                                      (uint8_t *) joineui);
 	  if (ret != BLE_STATUS_SUCCESS)
 	  {
 	    Error_Handler(); /* UNEXPECTED */

@@ -35,8 +35,11 @@ extern "C" {
 /* Exported functions ------------------------------------------------------- */
 void LoraService_Init(void);
 
-void updateRole(uint8_t master);
-void updateCounter(uint16_t counter);
+void updateDevEUI(uint8_t *deveui);  // Retrieve DEVEUI thru characteristic. 8 byte array
+void updateJoinEUI(uint8_t *joineui); // Retrieve APPEUI/JOINEUI thru characteristic. 8 byte array
+void setLoraData(uint8_t *data, uint16_t length); // Change data to periodically send
+void setLoraPeriod(uint16_t seconds); // Change period when to send data in seconds
+void updateStatus(uint8_t status); // 0: not joined, 1: joined
 void updateRSSI(uint8_t rssi);
 void updateSnr(uint8_t snr);
 

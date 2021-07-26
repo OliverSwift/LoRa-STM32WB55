@@ -24,7 +24,6 @@
 #include "lora_app.h"
 #include "stm32_seq.h"
 #include "hw_if.h"
-//#include "utilities_def.h"
 #include "lora_app_version.h"
 #include "lorawan_version.h"
 #include "subghz_phy_version.h"
@@ -32,6 +31,7 @@
 #include "LmHandler.h"
 #include "stm32_lpm.h"
 #include "sys_conf.h"
+#include "gatt_service.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -41,25 +41,6 @@
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
-
-/* Private typedef -----------------------------------------------------------*/
-/**
-  * @brief LoRa State Machine states
-  */
-typedef enum TxEventType_e
-{
-  /**
-    * @brief AppdataTransmition issue based on timer every TxDutyCycleTime
-    */
-  TX_ON_TIMER,
-  /**
-    * @brief AppdataTransmition external event plugged on OnSendEvent( )
-    */
-  TX_ON_EVENT
-  /* USER CODE BEGIN TxEventType_t */
-
-  /* USER CODE END TxEventType_t */
-} TxEventType_t;
 
 /* USER CODE BEGIN PTD */
 
@@ -149,12 +130,17 @@ static void OnMacProcessNotify(void);
   */
 static uint8_t AppDataBuffer[LORAWAN_APP_DATA_BUFFER_MAX_SIZE];
 
+static uint8_t CurrentAppData[16] = "STM32WB55 here!";
+static uint16_t CurrentDataLength = 15;
+
 /**
   * @brief User application data structure
   */
 static LmHandlerAppData_t AppData = { 0, 0, AppDataBuffer };
 
 static ActivationType_t ActivationType = LORAWAN_DEFAULT_ACTIVATION_TYPE;
+
+static uint16_t AppTxDutyCycle = APP_TX_DUTYCYCLE;
 
 /**
   * @brief LoRaWAN handler Callbacks
@@ -185,11 +171,6 @@ static LmHandlerParams_t LmHandlerParams =
   * @brief Specifies the state of the application LED
   */
 static uint8_t AppLedStateOn = RESET;
-
-/**
-  * @brief Type of Event to generate application Tx
-  */
-static TxEventType_t EventType = TX_ON_TIMER;
 
 /**
   * @brief Timer to handle the application Tx
@@ -248,18 +229,12 @@ void LoRaWAN_Init(void)
           (uint8_t)(__SUBGHZ_PHY_VERSION >> __APP_VERSION_SUB2_SHIFT));
 
   HW_TS_Create(1, &TxLedTimer, hw_ts_SingleShot, (HW_TS_pTimerCb_t)OnTxTimerLedEvent);
-  //UTIL_TIMER_Create(&TxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerLedEvent, NULL);
   HW_TS_Create(1, &RxLedTimer, hw_ts_SingleShot, (HW_TS_pTimerCb_t)OnRxTimerLedEvent);
-  //UTIL_TIMER_Create(&RxLedTimer, 0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnRxTimerLedEvent, NULL);
   HW_TS_Create(1, &JoinLedTimer, hw_ts_Repeated, (HW_TS_pTimerCb_t)OnJoinTimerLedEvent);
-  //UTIL_TIMER_Create(&JoinLedTimer, 0xFFFFFFFFU, UTIL_TIMER_PERIODIC, OnJoinTimerLedEvent, NULL);
-
-  //UTIL_TIMER_SetPeriod(&TxLedTimer, 500);
-  //UTIL_TIMER_SetPeriod(&RxLedTimer, 500);
-  //UTIL_TIMER_SetPeriod(&JoinLedTimer, 500);
 
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LmHandlerProcess), UTIL_SEQ_RFU, LmHandlerProcess);
   UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), UTIL_SEQ_RFU, SendTxData);
+
   /* Init Info table used by LmHandler*/
   LoraInfo_Init();
 
@@ -269,51 +244,17 @@ void LoRaWAN_Init(void)
   LmHandlerConfigure(&LmHandlerParams);
 
   HW_TS_Start(JoinLedTimer, 500*1000/CFG_TS_TICK_VAL);
-  //UTIL_TIMER_Start(&JoinLedTimer);
 
   LmHandlerJoin(ActivationType);
 
-  if (EventType == TX_ON_TIMER)
-  {
-    /* send every time timer elapses */
-	HW_TS_Create(1, &TxTimer, hw_ts_SingleShot, (HW_TS_pTimerCb_t)OnTxTimerEvent);
-	HW_TS_Start(TxTimer, APP_TX_DUTYCYCLE*1000/CFG_TS_TICK_VAL);
-    //UTIL_TIMER_Create(&TxTimer,  0xFFFFFFFFU, UTIL_TIMER_ONESHOT, OnTxTimerEvent, NULL);
-    //UTIL_TIMER_SetPeriod(&TxTimer,  APP_TX_DUTYCYCLE);
-    //UTIL_TIMER_Start(&TxTimer);
-  }
-  else
-  {
-    /* send every time button is pushed */
-    //BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
-  }
+  /* send every time timer elapses */
+  HW_TS_Create(1, &TxTimer, hw_ts_SingleShot, (HW_TS_pTimerCb_t)OnTxTimerEvent);
+  HW_TS_Start(TxTimer, APP_TX_DUTYCYCLE*1000/CFG_TS_TICK_VAL);
 
   /* USER CODE BEGIN LoRaWAN_Init_Last */
 
   /* USER CODE END LoRaWAN_Init_Last */
 }
-
-#if 0
-void BSP_PB_Callback(Button_TypeDef Button)
-{
-  /* USER CODE BEGIN BSP_PB_Callback_1 */
-
-  /* USER CODE END BSP_PB_Callback_1 */
-  switch (Button)
-  {
-    case  BUTTON_USER:
-      UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_LoRaSendOnTxTimerOrButtonEvent), CFG_SEQ_Prio_0);
-      /* USER CODE BEGIN PB_Callback 1 */
-      /* USER CODE END PB_Callback 1 */
-      break;
-    default:
-      break;
-  }
-  /* USER CODE BEGIN BSP_PB_Callback_Last */
-
-  /* USER CODE END BSP_PB_Callback_Last */
-}
-#endif
 
 /* Private functions ---------------------------------------------------------*/
 /* USER CODE BEGIN PrFD */
@@ -328,11 +269,15 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
   if ((appData != NULL) && (params != NULL))
   {
     LED_On(LED_GREEN);
+
+#if defined (APP_LOG_ENABLED) && (APP_LOG_ENABLED == 1)
     static const char *slotStrings[] = { "1", "2", "C", "C Multicast", "B Ping-Slot", "B Multicast Ping-Slot" };
 
     APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### ========== MCPS-Indication ==========\r\n");
     APP_LOG(TS_OFF, VLEVEL_H, "###### D/L FRAME:%04d | SLOT:%s | PORT:%d | DR:%d | RSSI:%d | SNR:%d\r\n",
             params->DownlinkCounter, slotStrings[params->RxSlot], appData->Port, params->Datarate, params->Rssi, params->Snr);
+#endif
+
     switch (appData->Port)
     {
       case LORAWAN_SWITCH_CLASS_PORT:
@@ -395,20 +340,26 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
   /* USER CODE END OnRxData_2 */
 }
 
+void setLoraData(uint8_t *data, uint16_t length) {
+	  memcpy(CurrentAppData, data, length);
+	  CurrentDataLength = length;
+}
+
+void setLoraPeriod(uint16_t period) {
+	AppTxDutyCycle = period*1000;
+}
+
 static void SendTxData(void)
 {
-  uint32_t i = 0;
   uint32_t nextTxIn = 0;
   /* USER CODE BEGIN SendTxData_1 */
+
+  memcpy(AppData.Buffer, CurrentAppData, CurrentDataLength);
+  AppData.BufferSize = CurrentDataLength;
 
   /* USER CODE END SendTxData_1 */
 
   AppData.Port = LORAWAN_USER_APP_PORT;
-
-  memcpy(AppData.Buffer, "STM32WB55 here!", 15);
-  i += 15;
-
-  AppData.BufferSize = i;
 
   if (LORAMAC_HANDLER_SUCCESS == LmHandlerSend(&AppData, LORAWAN_DEFAULT_CONFIRMED_MSG_STATE, &nextTxIn, false))
   {
@@ -420,8 +371,10 @@ static void SendTxData(void)
   }
 
   /*Wait for next tx slot*/
-  HW_TS_Start(TxTimer, APP_TX_DUTYCYCLE*1000/CFG_TS_TICK_VAL);
-  //UTIL_TIMER_Start(&TxTimer);
+  HW_TS_Start(TxTimer, AppTxDutyCycle*1000/CFG_TS_TICK_VAL);
+
+  // Update GATT status characteristic
+  updateStatus(LmHandlerJoinStatus());
 
   /* USER CODE BEGIN SendTxData_2 */
 
@@ -481,9 +434,8 @@ static void OnTxData(LmHandlerTxParams_t *params)
   if ((params != NULL) && (params->IsMcpsConfirm != 0))
   {
     LED_On(LED_RED) ;
-    HW_TS_Start(TxLedTimer, 500*1000/CFG_TS_TICK_VAL);
 
-    //UTIL_TIMER_Start(&TxLedTimer);
+    HW_TS_Start(TxLedTimer, 500*1000/CFG_TS_TICK_VAL);
 
     APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### ========== MCPS-Confirm =============\r\n");
     APP_LOG(TS_OFF, VLEVEL_H, "###### U/L FRAME:%04d | PORT:%d | DR:%d | PWR:%d", params->UplinkCounter,
@@ -515,9 +467,10 @@ static void OnJoinRequest(LmHandlerJoinParams_t *joinParams)
     if (joinParams->Status == LORAMAC_HANDLER_SUCCESS)
     {
       HW_TS_Stop(JoinLedTimer);
-      //UTIL_TIMER_Stop(&JoinLedTimer);
 
       LED_Off(LED_BLUE) ;
+
+      updateStatus(LmHandlerJoinStatus());
 
       APP_LOG(TS_OFF, VLEVEL_M, "\r\n###### = JOINED = ");
       if (joinParams->Mode == ACTIVATION_TYPE_ABP)
