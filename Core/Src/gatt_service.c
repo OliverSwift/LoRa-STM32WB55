@@ -97,14 +97,13 @@ static SVCCTL_EvtAckStatus_t LoraService_EventHandler(void *Event)
       {
       case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
         attribute_modified = (aci_gatt_attribute_modified_event_rp0*)blue_evt->data;
-        if(attribute_modified->Attr_Handle == (loraServiceContext.PeriodCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET))
-        {
+        if(attribute_modified->Attr_Handle == (loraServiceContext.PeriodCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET)
+        		&& attribute_modified->Attr_Data_Length == 2) {
         	uint16_t seconds;
 			seconds = *((uint16_t *)attribute_modified->Attr_Data);
         	setLoraPeriod(seconds);
         	return_value = SVCCTL_EvtAckFlowEnable;
-        } else if(attribute_modified->Attr_Handle == (loraServiceContext.DataCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET))
-		{
+        } else if(attribute_modified->Attr_Handle == (loraServiceContext.DataCharacteristicHandle + CHAR_VALUE_HANDLE_OFFSET)) {
 			setLoraData(attribute_modified->Attr_Data, attribute_modified->Attr_Data_Length);
 			return_value = SVCCTL_EvtAckFlowEnable;
 		}

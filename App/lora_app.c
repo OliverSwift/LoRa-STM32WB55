@@ -278,6 +278,9 @@ static void OnRxData(LmHandlerAppData_t *appData, LmHandlerRxParams_t *params)
             params->DownlinkCounter, slotStrings[params->RxSlot], appData->Port, params->Datarate, params->Rssi, params->Snr);
 #endif
 
+    updateRSSI(params->Rssi);
+    updateSnr(params->Snr);
+
     switch (appData->Port)
     {
       case LORAWAN_SWITCH_CLASS_PORT:
