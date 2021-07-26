@@ -126,7 +126,9 @@ Again, the code relies on a different RTC wrapper than the BLE stack, so it has 
 
 The original example, LoRaWAN End Node, sends a very complete set of data, where I reduced the test frame to a simple text.
 
-The device is set to Join the network using OTAA, so 3 elements are needed: DevEUI, JoinEUI and APPKey. DevEUI is a unique identifier for a hardware device and is built from STM32 "serial number". The JoinEUI (or former AppEUI) identifier is used for applications segragation. The APPKey is very important (and AES128 key) that muts be kept very secretly. The source code arbitrary set it to a value that must be changed for final use. Secrecy is done by Semtech code using a Secure Element API, in our case it's a virtual SE but this very convenient if you happen to use an actual one.
+The device is set to Join the network using OTAA, so 3 elements are needed: DevEUI, JoinEUI and APPKey. DevEUI is a unique identifier for a hardware device and is built from STM32 "serial number". The JoinEUI (or former AppEUI) identifier is used for application separation on server side. The APPKey is very important (a AES128 key) that muts be kept very secretly. The source code arbitrary set it to a value that must be changed for final use. Secrecy is done by Semtech code using a Secure Element API, in our case it's a virtual SE but this very convenient if you happen to use an actual one.
+
+JoinEUI and AppKEY are hardcoded in [se-identity.h](App/se-identity.h) file (_LORAWAN_APP_KEY_ and _LORAWAN_NWK_KEY_ **must** be same values for OTAA, the latter is used to compute the MIC and is necessary for the JoinRequest to be valid on LNS).
 
 Testing with TTN and TTIG gateway gives these:
 
@@ -137,6 +139,22 @@ For the declarative part.
 ![Live Data](/Docs/TTN-LiveData.png)
 
 Once the two boards had a positive reply from their respective JoinRequest.
+
+A special GATT service has been written to expose:
+
+Attribute | Access | Comment
+----------|--------|--------
+Status|Read| Whether or not the JoinRequest has completed
+DevEUI|Read| Readout of computed DevEUI
+JoinEUI|Read| Readout of hardcoded JoinEUI/AppEUI
+Data|Write|Data that will be sent (16 bytes max.). Defaults to "STM32WB55 here!"
+Period|Write| Period in seconds at which data are sent (defaults to 10 seconds)
+RSSI|Read| Updated when downlink message is received
+SNR|Read| Updated when downlink message is received
+
+Here an illustration of the exposed characteristics when connected to it:
+
+![LoRaWAN-GATT](Docs/LoraWAN-GATT.png)
 
 _to be continued_
 
