@@ -5,7 +5,6 @@
 ***Project status:***
 - [x] **Ping Pong SubGhzPhy application**
 - [x] add BLE stack along with LoRa Ping Pong
-- [ ] Master/slave LoRa/BLE application
 - [x] LoRaWAN example
 - [ ] LPM management
 
@@ -46,7 +45,15 @@ Never forget to plug the antenna prior to powering up the boards. You may damage
 Of course, buying two of each is a bit necessary for Ping Pong.
 
 ## Software
-### Licenses
+### Software packages and licenses
+
+Package|Version
+-------|-------
+STM32CubeIDE| 1.7
+STM32CubeMX|6.3.0
+FW_WB|1.12.1
+I-CUBE-LRWAN| 2.0
+
 Major part of the code are covered by ST and Semtech sublicensing. Check out respective agreements for proper use:
 
 Component | Copyright | License
@@ -59,9 +66,9 @@ Cortex®-M CMSIS | ARM Ltd | [BSD-3-Clause](https://opensource.org/licenses/BSD-
 My favorite development environment is Linux but ST tools are available for Mac and Windows as well. The first two are easier to setup, usually no issues or driver problems. Well, real tech savvy's know that already.
 
 Although I'm not a great fan of IDEs, STM32CudeIDE works ok and ST plugins helped (MX, Software expansions download,...).
-STMicro provides a software expansion package for some LoRa shields. As linked above it's the I-CUBE-LRWAN and contains example projects and libraries like low level SX1272 drivers (through the SPI) and the LoRaWAN stack (1.0.3 compatible).
+STMicro provides a software expansion package for some LoRa shields. As linked above it's the I-CUBE-LRWAN and contains example projects and libraries like low level SX1272 drivers (through the SPI) and the LoRaWAN stack ([1.0.3 compatible](https://lora-alliance.org/resource_hub/lorawan-specification-v1-0-3/)).
 
-The project can easily be open in STM32CudeIDE without dependencies. All code is there no need to install WB or LoRaWAN firmare from ST. Open  the project and build it (tested on Linux and MacOS). Of course, you'll need the BLE Stack firmware installed for CPU2. Here, _stm32wb5x_BLE_Stack_full_fw.bin_ has been flashed. Every stacks firmware are provided in _Projects/STM32WB_Copro_Wireless_Binaries/STM32WB5x_ directories of STM32CubeWB firmware package as well as how to program the boards for this. It needs to be done once.
+The project can easily be open in STM32CudeIDE without dependencies. All code is there no need to install WB or LoRaWAN firmare from ST. Open  the project and build it (tested on Linux and MacOS). However, you need the BLE Stack firmware installed for CPU2. Here, _stm32wb5x_BLE_Stack_full_fw.bin_ has been flashed. Every stacks firmware are provided in _Projects/STM32WB_Copro_Wireless_Binaries/STM32WB5x_ directories of STM32CubeWB firmware package as well as how to program the boards for this. It needs to be done **once**.
 
 The whole experiment needed some extra tools. I used the mighty [nRF52840 USB Dongle](https://www.nordicsemi.com/Products/Development-hardware/nRF52840-Dongle) with [NRF Connect For Desktop 3.7.0](https://www.nordicsemi.com/Products/Development-tools/nRF-Connect-for-desktop) (available on Linux, Mac and Windows) from Nordic Semiconductor to test BLE connection. I know that smartphones can do that, I use [LightBlue](https://punchthrough.com/lightblue/) on iOS or Android, but when you mess about UUIDs or Device names the platforms tend to become lost whith their cached data, so I like to figure out what's going on with development tools like Nordic ones.
 
@@ -115,16 +122,13 @@ For a useful demo, I wrote a dedicated GATT service so both boards could be inte
 
 That done, I preferred to spend some more time on a slightly different LoRa application controlled by BLE, which is the next step.
 
-#### Master/slave LoRa/BLE application
-On hold for now.
-
 #### LoRaWAN stack integration
 The LoRaWAN stack is the one by Semtech provided in the [I-CUBE-LRWAN expansion package](https://www.st.com/en/embedded-software/i-cube-lrwan.html).
-It is 1.0.3 compliant and includes certification software package if LoRa compliance is needed for the final device.
+It is 1.0.3 compliant and includes certification software package if LoRa Alliance certification is needed for the final device.
 
-Again, the code relies on a different RTC wrapper than the BLE stack, so it has been been modified for that. The number of timers has been increased because initial HW TimerServer setting is too limited for running the two stckas concurrently (checkout hw_if.h file).
+Again, the code relies on a different RTC wrapper than the BLE stack, so it has been been modified for that. The number of timers has been increased because initial HW TimerServer setting is too limited for running the two stacks concurrently (hw_if.h file changed after modified ioc).
 
-The original example, LoRaWAN End Node, sends a very complete set of data, where I reduced the test frame to a simple text.
+The original example, LoRaWAN End Node, sends a very complete set of data, I drastically reduced the test frame to a simple text.
 
 The device is set to Join the network using OTAA, so 3 elements are needed: DevEUI, JoinEUI and APPKey. DevEUI is a unique identifier for a hardware device and is built from STM32 "serial number". The JoinEUI (or former AppEUI) identifier is used for application separation on server side. The APPKey is very important (a AES128 key) that muts be kept very secretly. The source code arbitrary set it to a value that must be changed for final use. Secrecy is done by Semtech code using a Secure Element API, in our case it's a virtual SE but this very convenient if you happen to use an actual one.
 
@@ -152,9 +156,15 @@ Period|Write| Period in seconds at which data are sent (defaults to 10 seconds)
 RSSI|Read| Updated when downlink message is received
 SNR|Read| Updated when downlink message is received
 
+> Note: don't mess with period, there is a duty cycle limitation of 1%.
+> With the default settings, the module sends 15 bytes every 10 seconds. At SF7BW125 this can be
+> done at the lowest period of ~7 secs.
+
 Here an illustration of the exposed characteristics when connected to it:
 
 ![LoRaWAN-GATT](Docs/LoraWAN-GATT.png)
+
+#### Low power management
 
 _to be continued_
 
