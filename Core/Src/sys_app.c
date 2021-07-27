@@ -94,14 +94,6 @@ void SystemApp_Init(void)
 
   /* USER CODE END SystemApp_Init_1 */
 
-  /*Initialises timer and RTC*/
-  HW_TS_Init(hw_ts_InitMode_Full, &hrtc); /**< Initialize the TimerServer */
-
-  //Gpio_PreInit();
-
-  /* Configure the debug mode*/
-  //DBG_Init();
-
 #if 0
   /*Initialize the terminal */
   UTIL_ADV_TRACE_Init();

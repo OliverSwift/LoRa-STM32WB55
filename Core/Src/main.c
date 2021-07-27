@@ -80,6 +80,8 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
+  /* Config code for STM32_WPAN (HSE Tuning must be done before system clock configuration) */
+  MX_APPE_Config();
 
   /* USER CODE BEGIN Init */
 
@@ -89,7 +91,7 @@ int main(void)
   SystemClock_Config();
 
   /* IPCC initialisation */
-  MX_IPCC_Init();
+   MX_IPCC_Init();
 
   /* USER CODE BEGIN SysInit */
 
@@ -101,9 +103,6 @@ int main(void)
   MX_SPI1_Init();
   MX_RF_Init();
   /* USER CODE BEGIN 2 */
-  MX_LoRaWAN_Init();
-
-
   BSP_LED_Init(LED_RED);
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Init(LED_BLUE);
@@ -111,12 +110,14 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Init code for STM32_WPAN */
-  APPE_Init();
+  MX_APPE_Init();
+  MX_LoRaWAN_Init();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_APPE_Process();
 
     /* USER CODE BEGIN 3 */
 	MX_LoRaWAN_Process();
