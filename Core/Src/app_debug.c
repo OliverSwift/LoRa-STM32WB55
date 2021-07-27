@@ -60,7 +60,7 @@ typedef PACKED_STRUCT
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_TracesConfig_t APPD_TracesConfig={0, 0, 0, 0};
-PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_GeneralConfig_t APPD_GeneralConfig={BLE_DTB_CFG, {0, 0, 0}};
+PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static SHCI_C2_DEBUG_GeneralConfig_t APPD_GeneralConfig={BLE_DTB_CFG, 0, {0, 0}};
 
 #ifdef CFG_DEBUG_TRACE_UART
 #if(CFG_HW_LPUART1_ENABLED == 1)
