@@ -1,0 +1,13 @@
+{# Import the theme's layout. #}
+{% extends '!layout.html' %}
+
+{%- block extrahead %}
+{# Add custom things to the head HTML tag #}
+<meta property="og:title" content="LoRaWAN on STM32WB55" />
+<meta property="og:description" content="IoT world: Making work a SX1272 shield on STM32WB55 board to marry LoRaWAN and BLE" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://debon.org/LoRa/_images/STM32WB55-SX1272-1.jpg" />
+<meta property="og:site_name" content="DEBON.org" />
+{# Call the parent block #}
+{{ super() }}
+{%- endblock %}
