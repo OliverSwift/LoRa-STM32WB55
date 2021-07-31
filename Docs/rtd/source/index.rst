@@ -3,6 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. image:: images/GitHub-Mark-64px.png
+
+The whole project is hosted at `GitHub <https://github.com/OliverSwift/LoRa-STM32WB55>`_.
+
 LoRaWAN on STM32WB55 project
 ============================
 
