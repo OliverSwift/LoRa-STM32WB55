@@ -26,7 +26,6 @@ With upcoming LoRa 2.4GHz this is to be considered as transitional work. The SX1
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    hardware
    software
