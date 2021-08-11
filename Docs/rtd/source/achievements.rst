@@ -50,7 +50,7 @@ So the radio interface definition has been modified to match the Nucleo-WB55 boa
 
 RTC has clock source set to LSE.
 
-Original project file layout has also been slightly modified. The integration of the original files has been made on a MX generated project (**sx1272.ioc**) to preserve possibility to change the project. However, some cautious should be taken as **conflicting code** maybe generated.
+Original project file layout has also been slightly modified. The integration of the original files has been made on a MX generated project (**sx1272.ioc**) to preserve possibility to change the project. However, it should be precautiously done as *conflicting code* maybe generated.
 
 Programming two boards with this code works, and as expected the first board that receives a PONG response to a PING message becomes *master* the other becomes *slave*. I made the LED status reflect this (as formerly planned in the original code). One is blinking red where the other has the green LED blinking after a short time: VIDEO_.
 
