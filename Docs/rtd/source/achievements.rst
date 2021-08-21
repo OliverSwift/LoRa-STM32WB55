@@ -52,9 +52,9 @@ RTC has clock source set to LSE.
 
 Original project file layout has also been slightly modified. The integration of the original files has been made on a MX generated project (**sx1272.ioc**) to preserve possibility to change the project. However, it should be precautiously done as *conflicting code* maybe generated.
 
-Programming two boards with this code works, and as expected the first board that receives a PONG response to a PING message becomes *master* the other becomes *slave*. I made the LED status reflect this (as formerly planned in the original code). One is blinking red where the other has the green LED blinking after a short time: VIDEO_.
+Programming two boards with this code works, and as expected the first board that receives a PONG response to a PING message becomes *master* the other becomes *slave*. I made the LED status reflect this (as formerly planned in the original code). One is blinking red where the other has the green LED blinking after a short time:
 
-.. _VIDEO: https://debon.org/SX1272/sx1272_ping_pong.mp4
+.. video:: _static/sx1272_ping_pong.mp4
 
 BLE stack integration
 ---------------------
