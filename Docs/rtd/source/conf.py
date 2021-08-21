@@ -22,7 +22,8 @@ copyright = '2021, Olivier DEBON'
 author = 'Olivier DEBON'
 
 # The full version, including alpha/beta/rc tags
-release = '2.1'
+version = '2.1'
+release = '2.1.0'
 
 
 # -- General configuration ---------------------------------------------------
