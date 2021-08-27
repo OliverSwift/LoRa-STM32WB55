@@ -60,3 +60,7 @@ html_static_path = ['_static', 'videos']
 
 html_show_sourcelink = False
 html_title = "LoRaWAN on STM32WB55"
+
+html_css_files = [
+    'css/custom.css',
+]
